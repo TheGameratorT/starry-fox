@@ -16,3 +16,7 @@ tooltip {
 	border-image: 1 1 1 1 linear-gradient(to right, #9f1aff, #9f1aff, #8a46ff, #765dff, #5d7dff, #3e8cff, #1c99ff, #00a5ff, #00b4ff, #00c3ff, #00d0ff, #00ddff) !important;
   
   }
+
+findbar > .findbar-container {
+    flex: none !important;
+  }
