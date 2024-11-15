@@ -7,9 +7,9 @@
 @namespace html url("http://www.w3.org/1999/xhtml");
 
 /* Example - this creates a small dot to appear in the top left corner of "more tools" button popup - but not in any other panel */
-/*panel[viewId="appmenu-moreTools"]::part(arrowcontent)::before{
- content: "";
-  display: -moz-box;
+/*#customizationui-widget-panel[viewId="PanelUI-developer-tools"]::part(content)::before{
+  content: "";
+  display: flex;
   position: relative;
   z-index: 2;
   width: 9px;
