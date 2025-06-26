@@ -1,73 +1,92 @@
-   /*bookmarks bar color - make the bar translucent */
-  /*#PersonalToolbar{
-	background-color: rgb(14, 14, 14, 0.5) !important;
-	}*/
-	/*rgb(43, 42, 51, 0.60)*/
-  
-  /*Bookmarks bar show on hover*/
-  #PersonalToolbar{
-	--uc-bm-height: 20px; /* Might need to adjust if the toolbar has other buttons */
-	--uc-bm-padding: 4px; /* Vertical padding to be applied to bookmarks */
-	--uc-autohide-toolbar-delay: 250ms; /* The toolbar is hidden after delaytime */
-	
-	/* 0deg = "show" ; 90deg = "hide" ;  Set the following to control when bookmarks are shown */
-	--uc-autohide-toolbar-focus-rotation: 90deg; /* urlbar is focused */
-	--uc-autohide-toolbar-hover-rotation: 0deg; /* cursor is over the toolbar area */
-  }
+/* Source file https://github.com/MrOtherGuy/firefox-csshacks/tree/master/chrome/autohide_bookmarks_toolbar.css made available under Mozilla Public License v. 2.0
+See the above repository for updates as well as full license text. */
 
-  :root[uidensity="compact"] #PersonalToolbar {
-	--uc-bm-padding: 1px;
-  }
+#PersonalToolbar{
+  --uc-bm-height: 20px; /* Might need to adjust if the toolbar has other buttons */
+  --uc-bm-padding: 4px; /* Vertical padding to be applied to bookmarks */
+  --uc-autohide-toolbar-delay: 250ms; /* The toolbar is hidden after 0.6s */
 
-  :root[uidensity="touch"] #PersonalToolbar {
-	--uc-bm-padding: 7px;
-  }
-
-  #PersonalToolbar:not([customizing]){
-	position: relative;
-	margin-bottom: calc(-3px - var(--uc-bm-height) - 2 * var(--uc-bm-padding));
-	transform: rotateX(90deg);
-	transform-origin: top;
-	transition: transform 135ms linear var(--uc-autohide-toolbar-delay) !important;
-	z-index: 1;
-  }
-  
-  :root[uidensity="compact"] #PersonalToolbar{
-	--toolbarbutton-outer-padding: 1px !important;
-  }
-  
-  #PlacesToolbarItems > .bookmark-item,
-  #OtherBookmarks,
-  #PersonalToolbar > #import-button{
-	padding-block: var(--uc-bm-padding) !important;
-  }
-  
-  #nav-bar{
-	background-color: transparent !important;
-  }
-  
-  #nav-bar:focus-within + #PersonalToolbar{
-	transition-delay: 100ms !important;
-	transform: rotateX(var(--uc-autohide-toolbar-focus-rotation,0));
-  }
-  
-  #navigator-toolbox:is(:hover,:focus-within){
-	border-bottom-color: transparent !important;
-  }
-  
-  #navigator-toolbox:hover > #PersonalToolbar{
-	transition-delay: 100ms !important;
-	transform: rotateX(var(--uc-autohide-toolbar-hover-rotation,0));
-  }
-  
-  #navigator-toolbox:hover > #nav-bar:focus-within + #PersonalToolbar {  
-	transform: rotateX(0);
-  }
-
-  #navigator-toolbox{
-	border-bottom: none !important;
-	--browser-area-z-index-toolbox: 4;
+  /* 0deg = "show" ; 90deg = "hide" ;  Set the following to control when bookmarks are shown */
+  --uc-autohide-toolbar-focus-rotation: 0deg; /* urlbar is focused */
+  --uc-autohide-toolbar-hover-rotation: 0deg; /* cursor is over the toolbar area */
 }
+
+:root[uidensity="touch"] #PersonalToolbar{ --uc-bm-padding: 7px }
+
+#PersonalToolbar:not([customizing]){
+  position: relative;
+  margin-bottom: calc(-1px - var(--uc-bm-height) - 2 * var(--uc-bm-padding));
+  transform: rotateX(90deg);
+  transform-origin: top;
+  transition: transform 135ms linear var(--uc-autohide-toolbar-delay) !important;
+  z-index: 1;
+  /* The following properties should allow the themes with trasparent toolbars to work */
+  background-color: transparent !important;
+  background-repeat: no-repeat,no-repeat,var(--lwt-background-tiling);
+    /* y position will be wrong if menubar is enabled... */
+  --uc-bg-y: calc(-2 * (var(--tab-block-margin) + var(--toolbarbutton-inner-padding) + var(--toolbarbutton-outer-padding)) - var(--tab-min-height) - 24px - var(--bookmark-block-padding));
+  background-position: top left,top left,var(--lwt-background-alignment,top left);
+  background-position-y:top,top,var(--uc-bg-y),var(--uc-bg-y),var(--uc-bg-y);
+  background-image: var(--toolbar-bgimage,linear-gradient(transparent,transparent)), linear-gradient(var(--toolbar-bgcolor),var(--toolbar-bgcolor)),var(--lwt-header-image,var(--lwt-additional-images)) !important;
+}
+@media (-moz-bool-pref: "sidebar.verticalTabs"), -moz-pref("sidebar.verticalTabs"){
+  #PersonalToolbar{
+    --toolbar-bgcolor: transparent;
+  }
+  #PersonalToolbar:not([customizing]){
+    background-color: inherit !important;
+    margin-bottom: calc(0px - var(--uc-bm-height) - 2 * var(--uc-bm-padding));
+    --uc-bg-y: calc(0px - (2 * var(--toolbarbutton-inner-padding) + var(--toolbarbutton-outer-padding)) - 27px - var(--bookmark-block-padding));
+  }
+}
+:root[uidensity="compact"] #PersonalToolbar{
+  --toolbarbutton-outer-padding: 1px !important;
+}
+#PlacesToolbarItems > .bookmark-item,
+#OtherBookmarks,
+#PersonalToolbar > #import-button{
+  padding-block: var(--uc-bm-padding) !important;
+}
+
+#nav-bar:focus-within + #PersonalToolbar{
+  transition-delay: 100ms !important;
+  transform: rotateX(var(--uc-autohide-toolbar-focus-rotation,0));
+}
+#navigator-toolbox:is(:hover,:focus-within){
+  border-bottom-color: transparent !important;
+}
+#navigator-toolbox:hover > #PersonalToolbar{
+  transition-delay: 100ms !important;
+  transform: rotateX(var(--uc-autohide-toolbar-hover-rotation,0));
+}
+
+#navigator-toolbox:hover > #nav-bar:focus-within + #PersonalToolbar {
+  transform: rotateX(0);
+}
+#navigator-toolbox{
+  --browser-area-z-index-toolbox: 4;
+}
+/* Uncomment to enable compatibility for multi-row_bookmarks.css */
+/* This would break buttons placed in the toolbar but that is likely not happening if you are using multi-row setup  */
+/*
+#PersonalToolbar:not([customizing]){
+  min-height: 0 !important;
+  margin-bottom: 0;
+  height: 0;
+  overflow-y: visible !important;
+  z-index: 2;
+  padding-inline: 0 !important;
+}
+#personal-bookmarks{
+  background: inherit;
+  height: min-content;
+}
+#PlacesToolbarDropIndicatorHolder{
+  pointer-events: none !important;
+}
+*/
+
+
 
 
 /* grey #42414D */
@@ -271,24 +290,24 @@ toolbarbutton {
 
   }
   
- #urlbar-background,#urlbar:not([focused=true]) { 
+ #urlbar-background,#urlbar:not([focused]) {
 	border-radius: 4px !important;
 	border: transparent !important;
 	margin-bottom: 2px !important;
   }
 
-  #urlbar:not([focused=true]) {
+  #urlbar:not([focused]) {
 	background-image: linear-gradient(to right, rgb(159, 26, 255, 0.7), rgb(159, 26, 255, 0.7), rgb(138, 70, 255, 0.7), rgb(118, 93, 255, 0.7), rgb(93, 125, 255, 0.7), rgb(62, 140, 255, 0.7), rgb(28, 153, 255, 0.7), rgb(0, 165, 255, 0.7), rgb(0, 180, 255, 0.7), rgb(0, 195, 255, 0.7), rgb(0, 208, 255, 0.7), rgb(0, 221, 255, 0.7)) !important;
 	background-size: auto 4px !important;
 	background-repeat: no-repeat !important;
 	background-position: bottom !important;
   }
 
-  #urlbar[focused=true]{
+  #urlbar[focused]{
 	background-image: linear-gradient(to right, rgb(159, 26, 255, 0.7), rgb(159, 26, 255, 0.7), rgb(138, 70, 255, 0.7), rgb(118, 93, 255, 0.7), rgb(93, 125, 255, 0.7), rgb(62, 140, 255, 0.7), rgb(28, 153, 255, 0.7), rgb(0, 165, 255, 0.7), rgb(0, 180, 255, 0.7), rgb(0, 195, 255, 0.7), rgb(0, 208, 255, 0.7), rgb(0, 221, 255, 0.7)) !important;
 }
 			
-	#urlbar[focused=true] #urlbar-background{ 
+	#urlbar[focused] #urlbar-background{
 		border-radius: 4px !important;
 		border: transparent !important;
 		margin-bottom: 2px !important;
@@ -298,11 +317,11 @@ toolbarbutton {
 		background-color: rgb(17, 17, 17, 0.7) !important;
 			}
 			
-	#urlbar[open=true]{
+	#urlbar[open]{
 		background-image: linear-gradient(to right, rgb(159, 26, 255, 0.7), rgb(159, 26, 255, 0.7), rgb(138, 70, 255, 0.7), rgb(118, 93, 255, 0.7), rgb(93, 125, 255, 0.7), rgb(62, 140, 255, 0.7), rgb(28, 153, 255, 0.7), rgb(0, 165, 255, 0.7), rgb(0, 180, 255, 0.7), rgb(0, 195, 255, 0.7), rgb(0, 208, 255, 0.7), rgb(0, 221, 255, 0.7)) !important;
 	}
 
-	#urlbar[open=true] #urlbar-background{
+	#urlbar[open] #urlbar-background{
 		border-radius: 4px !important;
 		border: transparent !important;
 		margin-bottom: 2px !important;
