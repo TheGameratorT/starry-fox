@@ -1,1096 +1,868 @@
-/* Source file https://github.com/MrOtherGuy/firefox-csshacks/tree/master/chrome/autohide_bookmarks_toolbar.css made available under Mozilla Public License v. 2.0
-See the above repository for updates as well as full license text. */
+/* ==================== VARIABLES ==================== */
 
-#PersonalToolbar{
-  --uc-bm-height: 20px; /* Might need to adjust if the toolbar has other buttons */
-  --uc-bm-padding: 4px; /* Vertical padding to be applied to bookmarks */
-  --uc-autohide-toolbar-delay: 250ms; /* The toolbar is hidden after 0.6s */
+:root {
+  /* Purple → cyan accent gradient, solid and at 70% / 30% opacity */
+  --uc-gradient: linear-gradient(
+    to right,
+    #9f1aff, #8a46ff, #765dff, #5d7dff, #3e8cff, #1c99ff,
+    #00a5ff, #00b4ff, #00c3ff, #00d0ff, #00ddff
+  );
+  --uc-gradient-70: linear-gradient(
+    to right,
+    #9f1affb3, #8a46ffb3, #765dffb3, #5d7dffb3, #3e8cffb3, #1c99ffb3,
+    #00a5ffb3, #00b4ffb3, #00c3ffb3, #00d0ffb3, #00ddffb3
+  );
+  --uc-gradient-30: linear-gradient(
+    to right,
+    #9f1aff4d, #8a46ff4d, #765dff4d, #5d7dff4d, #3e8cff4d, #1c99ff4d,
+    #00a5ff4d, #00b4ff4d, #00c3ff4d, #00d0ff4d, #00ddff4d
+  );
 
-  /* 0deg = "show" ; 90deg = "hide" ;  Set the following to control when bookmarks are shown */
-  --uc-autohide-toolbar-focus-rotation: 0deg; /* urlbar is focused */
-  --uc-autohide-toolbar-hover-rotation: 0deg; /* cursor is over the toolbar area */
+  --toolbar-field-focus-border-color: transparent !important; /* remove default focus ring of url bar */
+  --organizer-outline-color: transparent !important; /* remove default focus ring of search box in library window */
+  --in-content-page-background: #101010 !important;
+  --tab-block-margin: 3px 3px !important; /* reduce tab margin */
+  -moz-appearance: none !important;
 }
 
-:root[uidensity="touch"] #PersonalToolbar{ --uc-bm-padding: 7px }
+/* ==================== TOOLBOX & TOOLBARS ==================== */
 
-#PersonalToolbar:not([customizing]){
+/* Theme colors behind the whole top area */
+#navigator-toolbox {
+  background-color: var(--lwt-accent-color) !important;
+  background-image: var(--lwt-header-image) !important;
+  background-position: right top !important;
+  border: none !important;
+  --tabs-navbar-shadow-size: 0px !important;
+}
+
+#TabsToolbar {
+  --toolbarbutton-inner-padding: 4px !important; /* newtab icon padding for compact mode */
+  padding-bottom: 0px !important;
+  margin-bottom: 0px !important;
+}
+
+/* Transparent nav bar, pulled up to fuse with the selected tab */
+#nav-bar {
+  background: transparent !important;
+  margin-top: -9px !important;
+  border: none !important;
+  box-shadow: none !important;
+  position: relative !important;
+  z-index: 0 !important;
+  /* Its top 9px sit under the tabs; keep the contents below them */
+  padding-top: 5px !important;
+}
+
+/* Bookmarks bar */
+#PersonalToolbar {
   position: relative;
-  margin-bottom: calc(-1px - var(--uc-bm-height) - 2 * var(--uc-bm-padding));
-  transform: rotateX(90deg);
-  transform-origin: top;
-  transition: transform 135ms linear var(--uc-autohide-toolbar-delay) !important;
-  z-index: 1;
-  /* The following properties should allow the themes with trasparent toolbars to work */
-  background-color: transparent !important;
-  background-repeat: no-repeat,no-repeat,var(--lwt-background-tiling);
-    /* y position will be wrong if menubar is enabled... */
-  --uc-bg-y: calc(-2 * (var(--tab-block-margin) + var(--toolbarbutton-inner-padding) + var(--toolbarbutton-outer-padding)) - var(--tab-min-height) - 24px - var(--bookmark-block-padding));
-  background-position: top left,top left,var(--lwt-background-alignment,top left);
-  background-position-y:top,top,var(--uc-bg-y),var(--uc-bg-y),var(--uc-bg-y);
-  background-image: var(--toolbar-bgimage,linear-gradient(transparent,transparent)), linear-gradient(var(--toolbar-bgcolor),var(--toolbar-bgcolor)),var(--lwt-header-image,var(--lwt-additional-images)) !important;
-}
-@media (-moz-bool-pref: "sidebar.verticalTabs"), -moz-pref("sidebar.verticalTabs"){
-  #PersonalToolbar{
-    --toolbar-bgcolor: transparent;
-  }
-  #PersonalToolbar:not([customizing]){
-    background-color: inherit !important;
-    margin-bottom: calc(0px - var(--uc-bm-height) - 2 * var(--uc-bm-padding));
-    --uc-bg-y: calc(0px - (2 * var(--toolbarbutton-inner-padding) + var(--toolbarbutton-outer-padding)) - 27px - var(--bookmark-block-padding));
-  }
-}
-:root[uidensity="compact"] #PersonalToolbar{
-  --toolbarbutton-outer-padding: 1px !important;
-}
-#PlacesToolbarItems > .bookmark-item,
-#OtherBookmarks,
-#PersonalToolbar > #import-button{
-  padding-block: var(--uc-bm-padding) !important;
-}
-
-#nav-bar:focus-within + #PersonalToolbar{
-  transition-delay: 100ms !important;
-  transform: rotateX(var(--uc-autohide-toolbar-focus-rotation,0));
-}
-#navigator-toolbox:is(:hover,:focus-within){
-  border-bottom-color: transparent !important;
-}
-#navigator-toolbox:hover > #PersonalToolbar{
-  transition-delay: 100ms !important;
-  transform: rotateX(var(--uc-autohide-toolbar-hover-rotation,0));
-}
-
-#navigator-toolbox:hover > #nav-bar:focus-within + #PersonalToolbar {
-  transform: rotateX(0);
-}
-#navigator-toolbox{
-  --browser-area-z-index-toolbox: 4;
-}
-/* Uncomment to enable compatibility for multi-row_bookmarks.css */
-/* This would break buttons placed in the toolbar but that is likely not happening if you are using multi-row setup  */
-/*
-#PersonalToolbar:not([customizing]){
-  min-height: 0 !important;
   margin-bottom: 0;
-  height: 0;
-  overflow-y: visible !important;
-  z-index: 2;
-  padding-inline: 0 !important;
+  z-index: 1;
+  background-color: rgba(23, 0, 39, 0.2) !important;
 }
-#personal-bookmarks{
-  background: inherit;
-  height: min-content;
+
+/* Floorp's "expand on focus" bookmarks bar overlaps the page with a margin
+   that assumes a 29px tall bar. Ours is shorter, so the page got pulled up
+   over the bottom of the nav bar. Float it below the toolbox instead. */
+#navigator-toolbox {
+  position: relative;
 }
-#PlacesToolbarDropIndicatorHolder{
-  pointer-events: none !important;
+
+#PersonalToolbar:not([customizing]) {
+  position: absolute !important;
+  top: 100% !important;
+  inset-inline: 0 !important;
+  margin-bottom: 0 !important;
 }
-*/
 
+toolbarbutton.bookmark-item {
+  margin-inline: 6px !important;
+}
 
+/* Remove drag space before 1st tab */
+:root[sizemode="normal"] .titlebar-spacer[type="pre-tabs"] {
+  display: none !important;
+}
 
+/* ==================== TABS ==================== */
 
-/* grey #42414D */
-/** Fix tab icon (sound icon was replacing site icon) */
-/* Always show tab icon */
+.tabbrowser-tab {
+  --tab-label-mask-size: 1em !important;
+  min-height: 24px !important;
+  padding-bottom: 0px !important;
+  margin-bottom: 0px !important;
+}
+
+#tabbrowser-tabs {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+  margin-bottom: 0px !important;
+  padding-bottom: 0px !important;
+}
+
+/* Prevent tab overflow increased height */
+#tabbrowser-arrowscrollbox {
+  --tab-min-height: 31px !important;
+  max-height: var(--tab-min-height);
+}
+
+/* Tab shape: rounded on all corners, as in starry-fox */
+.tab-background {
+  background-color: transparent !important;
+  background-image: none !important;
+  background-attachment: fixed !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  min-height: 33px !important;
+  margin-block: 0px !important;
+  border-radius: 4px !important;
+  overflow: hidden !important;
+  position: relative !important;
+}
+
+/* Selected tab gradient */
+.tabbrowser-tab[selected] .tab-background {
+  background: var(--uc-gradient-30) !important;
+}
+
+.tab-content {
+  padding-top: 0px !important;
+  align-items: center !important;
+}
+
+/* Close button hidden by default, appears on hover */
+.tabbrowser-tab:not([pinned]) .tab-close-button {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transition: opacity 200ms ease-in-out !important;
+}
+.tabbrowser-tab:not([pinned]):hover .tab-close-button {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.close-icon {
+  transition: fill 300ms cubic-bezier(0.245, 0.045, 0.255, 0.4) !important;
+}
+.close-icon:hover {
+  fill: #ff0000 !important;
+}
+
+/* Tab loading icon color */
+.tab-throbber::before {
+  fill: #00ddff !important;
+  opacity: 1 !important;
+}
+
+/* Icons match text color */
 .tab-icon-image {
-	opacity: 1 !important;
-  }
-  /* Move tab sound icon to the top left */
-  .tab-icon-overlay {
-	/* top - left */
-	top: -6px !important;
-	inset-inline-end: 6px !important;
-	width: 14px !important;
-	height: 14px !important;
-	padding: 1px !important;
-	/* background */
-	stroke: var(--tab-icon-overlay-stroke, black) !important;
-	background: var(--tab-icon-overlay-stroke, black) !important;
-	fill-opacity: 0.6 !important;
-	/* icon color */
-	color: #00DDFF !important;
-	/* circle */
-	border-radius: 10px !important;
-  }
-  .tab-icon-overlay:hover {
-	/* background */
-	fill-opacity: 1 !important;
-  }
-  
-  /* Remove tab close button. Appear on hover with smooth transitions */
-  .tabbrowser-tab:not([pinned]) .tab-close-button {
-	display: -moz-box !important;
-	opacity: 0;
-	visibility: collapse !important;
-	transition: all 200ms ease-in-out, fill 300ms cubic-bezier(0.645, 0.045, 0.355, 1) !important;
-		
-  }
-  
-  .tabbrowser-tab:not([pinned]):hover  .tab-close-button {
-	opacity: 1;
-	visibility: visible !important;
-	transition: all 200ms ease-in-out, fill 300ms cubic-bezier(0.645, 0.045, 0.355, 1) !important;	
-  }
-  .tabbrowser-tab:not([pinned]):hover  .tab-close-button:hover {
-	fill: #FF0000 !important;
-	transition: all 200ms ease-in-out, fill 300ms cubic-bezier(0.645, 0.045, 0.355, 1) !important;	
+  fill: currentColor !important;
+  filter: none !important;
 }
-	
-    /* Fix mask size */
-  .tabbrowser-tab {
-	--tab-label-mask-size: 1em !important;
-  }
 
-.close-icon{
-	transition: fill 300ms cubic-bezier(0.645, 0.045, 0.355, 1) !important;	
-  }
-  .close-icon:hover {
-	fill: #FF0000 !important;	
-  }
+/* Container tabs: side indicators instead of the context line */
+#tabbrowser-tabs .tab-context-line {
+  display: none !important;
+}
 
-  .tab-background{
-	border-radius: 4px !important;
-	border: transparent !important;
-  }
-	.tab-background[selected="true"] {
-		background: linear-gradient(to right, rgb(159, 26, 255, 0.3), rgb(159, 26, 255, 0.3), rgb(138, 70, 255, 0.3), rgb(118, 93, 255, 0.3), rgb(93, 125, 255, 0.3), rgb(62, 140, 255, 0.3), rgb(28, 153, 255, 0.3), rgb(0, 165, 255, 0.3), rgb(0, 180, 255, 0.3), rgb(0, 195, 255, 0.3), rgb(0, 208, 255, 0.3), rgb(0, 221, 255, 0.3)) no-repeat !important; 
-		
-	} 
-	 
-	  /*container indicator bar to the sides of the tab */
-	#tabbrowser-tabs .tab-context-line {
-		display: none;
-	}
-	
-	.tabbrowser-tab[class*="identity-color-"] .tab-background {
-		border-right: solid 2px var(--identity-icon-color) !important;
-		border-left: solid 2px var(--identity-icon-color) !important;
-		transition: all .15s ease-in-out !important;
-	}
-	
-	.tabbrowser-tab[class*="identity-color-"] .tab-background[selected="true"] {
-		border-right: solid 4px var(--identity-icon-color) !important;
-		border-left: solid 4px var(--identity-icon-color) !important;
-	}
+.tabbrowser-tab[class*="identity-color-"] {
+  border-left: 2px solid var(--identity-icon-color, #7c4dff) !important;
+  border-right: 2px solid var(--identity-icon-color, #7c4dff) !important;
+  border-radius: 4px !important;
+  background-clip: padding-box !important;
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  transition: border-width 0.15s ease-in-out, background-color 0.15s ease-in-out !important;
+}
 
-/*container tab label color when selected */
+.tabbrowser-tab[selected][class*="identity-color-"] {
+  border-left-width: 4px !important;
+  border-right-width: 4px !important;
+  background-color: rgba(0, 0, 0, 0.1) !important;
+}
+
 .tabbrowser-tab[class*="identity-color-"] .tab-label {
-    color: var(--identity-tab-color) !important;
+  text-shadow: 0 0 0 var(--identity-tab-color, #7c4dff) !important;
 }
 
-/*unread tabs -use tab flag extension*/
-.tabbrowser-tab[titlechanged]:not([selected="true"])  .tab-label{font-style: italic !important;color: #00DDFF !important;}
-
-.tabbrowser-tab[busy]:not([selected="true"]) .tab-label{font-style: italic !important;color: #00DDFF !important;}
-
-
-
-menupopup > menuitem,
-menupopup > menu
- {
-	border-radius: 4px !important;
-	margin-left: 4px !important;
-	margin-right: 4px !important;
+/* Cycling tab label colors: purple, off-white, teal, orange */
+.tabbrowser-tab:nth-child(4n + 1) .tab-label {
+  color: #cc66ff !important;
+}
+.tabbrowser-tab:nth-child(4n + 2) .tab-label {
+  color: #e0e0e0 !important;
+}
+.tabbrowser-tab:nth-child(4n + 3) .tab-label {
+  color: #00cccc !important;
+}
+.tabbrowser-tab:nth-child(4n) .tab-label {
+  color: #ffcc00 !important;
 }
 
+/* Unread and busy tabs */
+.tabbrowser-tab[titlechanged]:not([selected]) .tab-label,
+.tabbrowser-tab[busy]:not([selected]) .tab-label {
+  font-style: italic !important;
+  color: #00ddff !important;
+}
 
-/** Menu top items border and padding */
-/* context menu top left button padding */
-menugroup > menuitem:first-child {  
-	border-radius: 4px !important;
-	padding-left: 4px !important;
+/* Tab attention icon position */
+/* in console for testing: var titlechanger = window.setInterval(function(){document.title=document.title+'0';}, 5000); */
+.tabbrowser-tab:is([image], [pinned]) > .tab-stack > .tab-content[attention]:not([selected]),
+.tabbrowser-tab > .tab-stack > .tab-content[pinned][titlechanged]:not([selected]) {
+  background-position-x: left 2px !important;
+  background-position-y: bottom 12.5px !important;
 }
-/* context menu top right button padding */
-menugroup > menuitem:last-child {  
-	border-radius: 4px !important;
-	padding-right: 4px !important;
 
+/* New tab (+) button */
+#tabs-newtab-button .toolbarbutton-icon,
+#new-tab-button .toolbarbutton-icon {
+  fill: #cc66ff !important;
+  color: #cc66ff !important;
+  filter: none !important;
 }
-/* context menu top buttons radius */
-menugroup > menuitem {
-	border-radius: 4px !important;
+
+/* Ripple when a tab is selected */
+@keyframes ripple-effect {
+  from {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.5;
+  }
+  to {
+    transform: translate(-50%, -50%) scale(2.5); /* Lower scale keeps it from getting too wide */
+    opacity: 0;
+  }
 }
-menugroup > menuitem > hbox > image {  
+
+.tab-background::before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 60px;
+  height: 60px;
+  aspect-ratio: 1 / 1 !important;
+  background-color: rgba(255, 255, 255, 0.7) !important;
+  border-radius: 50% !important;
+  transform: translate(-50%, -50%) scale(0);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.tabbrowser-tab:is([selected], :focus-within) .tab-background::before {
+  animation: ripple-effect 0.8s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+/* ==================== TITLEBAR BUTTONS ==================== */
+
+.titlebar-button {
+  transition: all 0.2s ease !important;
+  padding: 8px 12px !important;
+}
+
+.titlebar-button > .toolbarbutton-icon {
+  width: 12px !important;
+  height: 12px !important;
+  stroke: currentColor !important;
+  fill: currentColor !important;
+  filter: none !important;
+}
+
+.titlebar-close {
+  color: #cc66ff !important;
+}
+.titlebar-close:hover {
+  background-color: rgba(204, 102, 255, 0.2) !important;
+}
+
+.titlebar-min,
+.titlebar-max,
+.titlebar-restore {
+  color: #00cccc !important;
+}
+.titlebar-min:hover,
+.titlebar-max:hover {
+  background-color: rgba(0, 204, 204, 0.2) !important;
+}
+
+/* ==================== URL BAR ==================== */
+
+/* Set on :root, where Firefox derives the urlbar's inner sizes from it.
+   26px plus the 2px border and 1px padding below gives a 30px bar. */
+:root {
+  --urlbar-height: 26px !important;
+}
+
+#urlbar-container {
+  padding-block: 4px !important;
+  margin-top: 0 !important;
+}
+
+#urlbar {
+  border: 2px solid transparent !important;
+  border-radius: 4px !important;
+  padding: 1px !important;
+  background: none !important;
+  box-shadow: none !important;
+  /* Don't grow the input past the toolbar when the results open */
+  --urlbar-input-growth-open-block: 0px !important;
+  --urlbar-input-growth-open-inline: 0px !important;
+}
+
+/* Unfocused: purple → cyan underline as in starry-fox, painted over the
+   bottom border so it stays inside the toolbar */
+#urlbar:not([focused], [open]) {
+  background: var(--uc-gradient-70) bottom / 100% 2px no-repeat border-box !important;
+}
+
+/* Focused/open: full gradient border */
+#urlbar:is([focused], [open]) {
+  background: linear-gradient(rgba(17, 17, 17, 0.7), rgba(17, 17, 17, 0.7)) padding-box,
+    var(--uc-gradient-70) border-box !important;
+}
+
+.urlbar-background {
+  border-radius: 2px !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.urlbar:is([focused], [open]) > .urlbar-background {
+  background: linear-gradient(rgba(17, 17, 17, 0.7), rgba(17, 17, 17, 0.7)) padding-box,
+    var(--uc-gradient-70) border-box !important;
+  box-shadow: none !important;
+}
+
+#urlbar-input {
+  background: transparent !important;
+  color: #fff !important;
+  border-radius: 6px !important;
+  padding: 0 4px !important;
+  box-shadow: none !important;
+}
+
+/* ==================== SEARCH BAR ==================== */
+
+#search-container {
+  padding-block: 0 !important;
+  min-width: 192px !important;
+}
+
+#searchbar {
+  border-radius: 4px !important;
+  border: transparent !important;
+  margin: 8px 12px !important;
+  padding: 6px 10px !important;
+  background-position: bottom !important;
+  background-size: auto 2px !important;
+  background-repeat: no-repeat !important;
+  background-image: var(--uc-gradient-70) !important;
+}
+
+.search-panel-tree > .autocomplete-richlistitem:hover {
   border-radius: 4px !important;
 }
-/* for menu item with submenu  */
-.panel-header > .subviewbutton {
-	border-radius: 4px !important;
-  }
 
-/* context menu padding */
+.search-panel-current-engine {
+  margin-left: 4px !important;
+  margin-right: 4px !important;
+}
+
+/* ==================== SIDEBAR ==================== */
+
+.sidebar-splitter {
+  display: none !important;
+}
+
+#sidebar-box #sidebar-header #sidebar-switcher-target {
+  transition: background-color 300ms cubic-bezier(0.245, 0.045, 0.255, 0.4) !important;
+}
+#sidebar-box #sidebar-header #sidebar-switcher-target:hover,
+#sidebar-box #sidebar-header #sidebar-switcher-target.active {
+  background-color: #313131 !important;
+}
+
+/* Sidebar item hover and selection rounded */
+treechildren::-moz-tree-row,
+treechildren::-moz-tree-cell {
+  border-radius: 4px !important;
+}
+
+/* Synced tabs sidebar items */
+.item-title-container {
+  border-radius: 4px !important;
+  margin-left: 4px !important;
+  margin-right: 4px !important;
+}
+
+/* Search boxes: dark with a gradient underline */
+#sidebar-search-container #search-box,
+search-textbox {
+  -moz-appearance: none !important;
+  background-color: #000000 !important;
+  border-radius: 4px !important;
+  margin-bottom: 2px !important;
+  background-position: bottom !important;
+  background-size: auto 2px !important;
+  background-repeat: no-repeat !important;
+  background-image: var(--uc-gradient-70) !important;
+}
+
+#sidebar-search-container #search-box:focus,
+search-textbox:focus {
+  background-color: rgb(17, 17, 17) !important;
+}
+
+search-textbox {
+  --focus-outline-color: transparent !important;
+  border: transparent !important;
+}
+
+#editBookmarkPanel .expander-up,
+#editBookmarkPanel .expander-down {
+  border: transparent !important;
+  border-radius: 4px !important;
+}
+
+/* ==================== FINDBAR ==================== */
+/* Floating findbar at the top. Originally posted by @torkelicious in
+   https://github.com/sagars007/starry-fox/issues/13#issuecomment-2556900723 */
+
+findbar {
+  order: -1 !important;
+  margin-bottom: -33px !important;
+  position: relative;
+  border-top: none !important;
+  padding: 0 !important;
+  transition: transform 82ms linear, opacity 82ms linear 32ms !important;
+  background: none !important;
+  pointer-events: none;
+  z-index: 1;
+  white-space: nowrap;
+}
+
+findbar[hidden] {
+  transform: translateY(-36px);
+}
+
+findbar > .findbar-container,
+findbar > .close-icon {
+  border: 1px solid #250023 !important;
+  border-width: 0 0 1px 0px !important;
+  background-color: #000000 !important;
+  background-image: linear-gradient(#160016, #000000), var(--lwt-header-image, none);
+  pointer-events: auto;
+}
+
+findbar > .findbar-container {
+  flex-direction: row-reverse;
+  border-bottom-right-radius: 4px;
+  border-right-width: 1px;
+  height: initial !important;
+  overflow-inline: visible !important;
+  margin-inline-start: 8px;
+}
+
+findbar > .findbar-container > hbox {
+  margin: 0 30px;
+}
+
+findbar::before {
+  content: "";
+  display: flex;
+  flex-grow: 1;
+}
+
+.findbar-find-status {
+  display: flex;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-grow: 1;
+}
+
+.findbar-closebutton {
+  margin: 0 !important;
+  border-radius: 0 !important;
+  padding: 5px !important;
+  width: initial !important;
+}
+
+.findbar-closebutton > image {
+  padding: 3px;
+}
+
+.findbar-closebutton:hover > image {
+  background: dodgerblue !important;
+  border-radius: 4px;
+}
+
+.findbar-textbox::placeholder,
+.findbar-highlight,
+.findbar-case-sensitive,
+.findbar-match-diacritics,
+.findbar-entire-word,
+.findbar-label {
+  font-family: "Fira Sans", sans-serif !important;
+  color: white !important;
+}
+
+.findbar-textbox {
+  background-color: black !important;
+  color: white !important;
+  font-family: "Fira Sans", sans-serif !important;
+}
+
+/* ==================== MENUS & PANELS ==================== */
+
+/* Menus get the dark background and a thin purple border */
+menupopup {
+  appearance: none !important;
+  border: 1px solid #9400ff !important;
+  border-radius: 4px !important;
+  padding: 0px !important;
+  background-color: #101010 !important;
+  box-shadow: 0 0 10px rgba(148, 0, 255, 0.3) !important;
+  min-width: 240px !important;
+
+  --panel-background: #101010 !important;
+  --panel-color: #ffffff !important;
+  --panel-border-color: var(--arrowpanel-border-color, Field) !important;
+  --menuitem-hover-background-color: var(--panel-item-hover-bgcolor, Field) !important;
+  --menuitem-disabled-hover-background-color: var(--panel-item-hover-bgcolor, Field) !important;
+  --menu-color: var(--arrowpanel-color, Field) !important;
+  --menu-disabled-color: color-mix(in srgb, var(--arrowpanel-background, Field) 65%, var(--lwt-tab-text, Field)) !important;
+  --menu-border-color: var(--panel-separator-color, Field) !important;
+}
+
+/* Panels draw no frame themselves; their inner content box does.
+   The middle-click autoscroll icon is a panel too and keeps Firefox's style. */
+panel:not(.autoscroller) {
+  appearance: none !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 8px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  min-width: 240px !important;
+
+  --panel-background: #101010 !important;
+  --panel-color: #ffffff !important;
+  --panel-border-color: transparent !important;
+  --panel-border-radius: 4px !important;
+}
+
+.panel-arrowcontent,
+#appMenu-mainView {
+  border: 1px solid #9400ff !important;
+  border-radius: 4px !important;
+  padding: 0px !important;
+  background-color: #101010 !important;
+}
+
+#appMenu-popup,
+#contentAreaContextMenu {
+  --panel-border-color: transparent !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#textbox-contextmenu {
+  --panel-color: rgba(255, 255, 255, 0.8) !important;
+  --panel-border-color: rgb(48, 48, 48) !important;
+  --panel-background: #101010 !important;
+  --menuitem-hover-background-color: #313131 !important;
+  --menuitem-disabled-hover-background-color: #1f1f1f !important;
+  --menu-color: rgba(255, 255, 255, 0.8) !important;
+  --menu-disabled-color: color-mix(in srgb, #101010 65%, rgb(255, 255, 255)) !important;
+  --menu-border-color: var(--panel-separator-color, Field) !important;
+}
+
+/* Fixes menu color for websites */
+#ContentSelectDropdown > menupopup {
+  background-color: transparent !important;
+  --content-select-background-image: none !important;
+  --panel-background: var(--arrowpanel-background, Field) !important;
+  --panel-color: var(--arrowpanel-color, Field) !important;
+}
+
+/* Fix background of some popup menus like in pdf viewer zoom menu */
+menu:not([_moz-menuactive="true"]),
+menuitem:not([_moz-menuactive="true"]) {
+  --content-select-background-image: none !important;
+}
+
+/* Menu items */
+menuitem,
+menu {
+  padding-block: 4px !important;
+  margin-inline: 4px !important;
+}
+
 menupopup > menuitem,
 menupopup > menu {
   padding-block: 2px !important;
   min-height: unset !important;
-}
-/* menu item padding */
-toolbarbutton {
-  --arrowpanel-menuitem-padding: 2px 8px;
-  
-}
-
-/*autocomplete dropdown rounded style*/
-#PopupAutoComplete > richlistbox > richlistitem {
-	border-radius: 4px !important;
-	
-  }
-
-  .autocomplete-richlistbox {
-	margin: 4px !important;
-	color: var(--arrowpanel-color, Field) !important; 
-  }
-
-
-  panel {
-	--panel-border-radius: 4px !important;
-	--panel-border-color: var(--arrowpanel-border-color) !important;
-	--panel-color: var(--arrowpanel-color, Field) !important;      
-	                                                                                              
-	/*changing panel bgcolor causes issues with middle mouse click scroll icon*/
-  }
-
-/* #main-menubar > menu  {border-radius: 4px !important} */
-
-/*toolbar hamburger menu gradient color*/
-  #appMenu-fxa-separator
-  {
-	border-image: 1 1 1 1 linear-gradient(to right, #9f1aff, #9f1aff, #8a46ff, #765dff, #5d7dff, #3e8cff, #1c99ff, #00a5ff, #00b4ff, #00c3ff, #00d0ff, #00ddff) !important;
-  }
-
-/*link hover tooltip custom*/
-#statuspanel-label{
-	-moz-appearance: none !important;
-	  color: rgba(255, 255, 255, 0.800000011920929) !important;
-	  background-color: #101010 !important;
-	border: 1px solid transparent !important;
-	border-image: 0 0 1 0 linear-gradient(to right, #9f1aff, #9f1aff, #8a46ff, #765dff, #5d7dff, #3e8cff, #1c99ff, #00a5ff, #00b4ff, #00c3ff, #00d0ff, #00ddff) !important;
-  
-  }
- 
-/*tooltip dark theme applied in js via autoconfig. Hits all tooltips*/
-
-/* purple #9400ff */
-/* tab loading icon color */
-.tab-throbber::before {
-	fill: #00DDFF !important;
-	opacity: 1 !important;
-	}
-
-
-  :root { --toolbar-field-focus-border-color: transparent !important; /*remove default focus ring of url bar */
-	--organizer-outline-color: transparent !important; /*remove default focus ring of search box in library window */
-	--in-content-page-background: #101010 !important;
-	}  
-
-  #urlbar-background,#urlbar{ 
-	
-	border-radius: 4px !important;
-	border: transparent !important;
-
-  }
-  
- #urlbar-background,#urlbar:not([focused]) {
-	border-radius: 4px !important;
-	border: transparent !important;
-	margin-bottom: 2px !important;
-  }
-
-  #urlbar:not([focused]) {
-	background-image: linear-gradient(to right, rgb(159, 26, 255, 0.7), rgb(159, 26, 255, 0.7), rgb(138, 70, 255, 0.7), rgb(118, 93, 255, 0.7), rgb(93, 125, 255, 0.7), rgb(62, 140, 255, 0.7), rgb(28, 153, 255, 0.7), rgb(0, 165, 255, 0.7), rgb(0, 180, 255, 0.7), rgb(0, 195, 255, 0.7), rgb(0, 208, 255, 0.7), rgb(0, 221, 255, 0.7)) !important;
-	background-size: auto 4px !important;
-	background-repeat: no-repeat !important;
-	background-position: bottom !important;
-  }
-
-  #urlbar[focused]{
-	background-image: linear-gradient(to right, rgb(159, 26, 255, 0.7), rgb(159, 26, 255, 0.7), rgb(138, 70, 255, 0.7), rgb(118, 93, 255, 0.7), rgb(93, 125, 255, 0.7), rgb(62, 140, 255, 0.7), rgb(28, 153, 255, 0.7), rgb(0, 165, 255, 0.7), rgb(0, 180, 255, 0.7), rgb(0, 195, 255, 0.7), rgb(0, 208, 255, 0.7), rgb(0, 221, 255, 0.7)) !important;
-}
-			
-	#urlbar[focused] #urlbar-background{
-		border-radius: 4px !important;
-		border: transparent !important;
-		margin-bottom: 2px !important;
-		margin-top: 2px !important;
-		margin-left: 2px !important;
-		margin-right: 2px !important;
-		background-color: rgb(17, 17, 17, 0.7) !important;
-			}
-			
-	#urlbar[open]{
-		background-image: linear-gradient(to right, rgb(159, 26, 255, 0.7), rgb(159, 26, 255, 0.7), rgb(138, 70, 255, 0.7), rgb(118, 93, 255, 0.7), rgb(93, 125, 255, 0.7), rgb(62, 140, 255, 0.7), rgb(28, 153, 255, 0.7), rgb(0, 165, 255, 0.7), rgb(0, 180, 255, 0.7), rgb(0, 195, 255, 0.7), rgb(0, 208, 255, 0.7), rgb(0, 221, 255, 0.7)) !important;
-	}
-
-	#urlbar[open] #urlbar-background{
-		border-radius: 4px !important;
-		border: transparent !important;
-		margin-bottom: 2px !important;
-		margin-top: 2px !important;
-		margin-left: 2px !important;
-		margin-right: 2px !important;
-		background-color: rgb(17, 17, 17, 0.7) !important;
-	}
-
-/* Remove additional buttons from the URL bar, show on hover with smooth transition */
-/*
-#urlbar-input-container>#page-action-buttons {
-	
-    opacity: 0;
-    transition: all 300ms ease-in-out;
-}
-
-#urlbar-input-container:hover>#page-action-buttons {
-	
-    animation: 300ms delayedFadeIn ease-in-out;
-    opacity: 1;
-}
-
-@keyframes delayedFadeIn {
-    0% {
-        opacity: 0;
-    }
-    35% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
-}
-*/
-
-/* url mask size change */
-/* #urlbar:not([focused])[textoverflow="right"] > #urlbar-input-container > .urlbar-input-box > #urlbar-input {
-	mask-image: linear-gradient(to left, transparent, black 1ch) !important;
-} */
-
-  #tabs-newtab-button .toolbarbutton-icon {
-	fill: #9400ff !important;
-  }
-
-/*in tab overflow bar*/
-  #tabs-newtab-button, #TabsToolbar #new-tab-button {
-	fill: #9400ff !important;
-  }
-
-  #scrollbutton-up .toolbarbutton-icon, #scrollbutton-down .toolbarbutton-icon{
-	fill: #9400ff !important;
-  }
-
-  #alltabs-button {
-	fill: #9400ff !important;
-  }
-
-/* remove drag space before 1st tab */
-:root[sizemode="normal"] .titlebar-spacer[type=pre-tabs] {
-
-	display: none !important;
-	
-	}
-
-/*■■■■■■■■■■■■■■■■■■■■■■■■■■ FINDBAR CODE ■■■■■■■■■■■■■■■■■■■■■■■■■■*/
-
-findbar{
-	-moz-box-ordinal-group: 0;
-	margin-bottom: -32px;
-	position: relative;
-	border-top-width: 0 !important;
-	padding: 0 !important;
-	transition: transform 82ms linear, opacity 82ms linear 32ms !important;
-	background: none !important;
-	pointer-events: none;
-	z-index: 1;
-  }
-  
-  .findbar-container > .findbar-find-fast{
-	padding: var(--toolbarbutton-inner-padding) 1px;
-	margin: 0 !important;
-  }
-  
-  findbar[hidden]{ transform: translateY(-30px);}
-  
-  findbar > .findbar-container,
-  findbar > .close-icon{
-	border: 1px transparent;
-	
-	background: var(--uc-light-bkgnd-color,var(--toolbar-bgcolor)) !important;
-	pointer-events: auto;
-  }
-  findbar > .findbar-container{
-	-moz-box-direction: reverse;
-	
-	border-top-left-radius: 4px;
-	border-bottom-left-radius: 4px;
-  }
-  
-  .findbar-find-status{
-	display: -moz-box;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	-moz-box-flex: 1;
-  }
-  
-  .findbar-closebutton{
-	margin: 0 !important;
-	
-	border-top-right-radius: 4px !important;
-	border-bottom-right-radius: 4px !important;
-	border-top-left-radius: 0px !important;
-	border-bottom-left-radius: 0px !important;
-
-	padding: 5px !important;
-  }
-  .findbar-closebutton > image{ padding: 3px }
-  .findbar-closebutton:hover > image{
-	background: var(--toolbarbutton-hover-background) !important;
-	border-radius: 4px
-  }
-  findbar > .findbar-container > hbox{ margin: 0 5px }
-  
-  findbar::before{
-	content:"";
-	display: -moz-box;
-	-moz-box-flex: 100;
-  }
-  
-  findbar{
-	margin-right: 16px;
-	
-  }
-
-
-
-.findbar-textbox{
-	border-radius: 4px !important;
-	border: transparent !important;
-	--focus-outline-color: transparent !important;
-	margin-bottom: 2px !important;
-	background-position: bottom !important;
-	background-size: auto 2px !important;
-	background-repeat: no-repeat !important;
-    background-image: linear-gradient(to right, rgb(159, 26, 255, 0.7), rgb(159, 26, 255, 0.7), rgb(138, 70, 255, 0.7), rgb(118, 93, 255, 0.7), rgb(93, 125, 255, 0.7), rgb(62, 140, 255, 0.7), rgb(28, 153, 255, 0.7), rgb(0, 165, 255, 0.7), rgb(0, 180, 255, 0.7), rgb(0, 195, 255, 0.7), rgb(0, 208, 255, 0.7), rgb(0, 221, 255, 0.7)) !important;
-}
-
-.findbar-textbox:focus{
-	border-radius: 4px !important;
-	border: transparent !important;
-	--focus-outline-color: transparent !important;
-	background-color: rgb(17, 17, 17) !important;
-}
-
-/*searchbar in navbar */
-#searchbar{
-	border-radius: 4px !important;
-	border: transparent !important;
-	margin-bottom: 2px !important;
-	background-position: bottom !important;
-	background-size: auto 2px !important;
-	background-repeat: no-repeat !important;
-    background-image: linear-gradient(to right, rgb(159, 26, 255, 0.7), rgb(159, 26, 255, 0.7), rgb(138, 70, 255, 0.7), rgb(118, 93, 255, 0.7), rgb(93, 125, 255, 0.7), rgb(62, 140, 255, 0.7), rgb(28, 153, 255, 0.7), rgb(0, 165, 255, 0.7), rgb(0, 180, 255, 0.7), rgb(0, 195, 255, 0.7), rgb(0, 208, 255, 0.7), rgb(0, 221, 255, 0.7)) !important;
-}
-
-  .search-panel-tree > .autocomplete-richlistitem:hover {
-	border-radius: 4px !important;
-  }
-
-  .search-panel-current-engine {
-	margin-left: 4px !important;
-	margin-right: 4px !important;
-  }
-  
-  #searchbar-one-offs-header-label{
-	  display: none !important;
-  }
-
-
-#sidebar-search-container #search-box {
-	-moz-appearance: none !important;
-	background-color: #000000 !important;
-	border-radius: 4px !important;
-	/*border-top: 2px solid #000000 !important;
-	border-left:2px solid #000000 !important;
-	border-right: 2px solid #000000 !important; */
-	margin-bottom: 2px !important;
-	background-position: bottom !important;
-	background-size: auto 2px !important;
-	background-repeat: no-repeat !important;
-    background-image: linear-gradient(to right, rgb(159, 26, 255, 0.7), rgb(159, 26, 255, 0.7), rgb(138, 70, 255, 0.7), rgb(118, 93, 255, 0.7), rgb(93, 125, 255, 0.7), rgb(62, 140, 255, 0.7), rgb(28, 153, 255, 0.7), rgb(0, 165, 255, 0.7), rgb(0, 180, 255, 0.7), rgb(0, 195, 255, 0.7), rgb(0, 208, 255, 0.7), rgb(0, 221, 255, 0.7)) !important;
-  }
-
-  #sidebar-search-container #search-box:focus {
-	-moz-appearance: none !important;
-	background-color: rgb(17, 17, 17) !important;
-	border-radius: 4px !important;
-	/*border-top: 2px solid #313131 !important;
-	border-left: 2px solid #313131 !important;
-	border-right: 2px solid #313131 !important; */
-	margin-bottom: 2px !important;
-	background-position: bottom !important;
-	background-size: auto 2px !important;
-	background-repeat: no-repeat !important;
-    background-image: linear-gradient(to right, rgb(159, 26, 255, 0.7), rgb(159, 26, 255, 0.7), rgb(138, 70, 255, 0.7), rgb(118, 93, 255, 0.7), rgb(93, 125, 255, 0.7), rgb(62, 140, 255, 0.7), rgb(28, 153, 255, 0.7), rgb(0, 165, 255, 0.7), rgb(0, 180, 255, 0.7), rgb(0, 195, 255, 0.7), rgb(0, 208, 255, 0.7), rgb(0, 221, 255, 0.7)) !important;
-  }
-
-  .sidebar-splitter {
-	display: none !important
-  }
-
-/* sidebar view button*/
-  #viewButton{
-	background-color: #000000 !important;
-	border-radius: 4px !important;
-	transition: background-color 300ms cubic-bezier(0.645, 0.045, 0.355, 1) !important;
-
-  }
-  
-  #viewButton:hover{
-	background-color: #313131 !important;
-	
-  }
-
-
-  #sidebar-box #sidebar-header #sidebar-switcher-target {
-	transition: background-color 300ms cubic-bezier(0.645, 0.045, 0.355, 1) !important;
-  }
-  #sidebar-box #sidebar-header #sidebar-switcher-target:hover,
-  #sidebar-box #sidebar-header #sidebar-switcher-target.active {
-	  background-color: #313131 !important;
-  }
-/* sidebar item hover and selection rounded */ 
-  treechildren::-moz-tree-row,
-  treechildren::-moz-tree-cell {
   border-radius: 4px !important;
 }
-/* synced tabs sidebar item hover and selection rounded */  
-.item-title-container{
-	border-radius: 4px !important;
-	margin-left: 4px !important;
-	margin-right: 4px !important;
+
+menuitem,
+menu,
+.menu-text,
+label,
+.toolbarbutton-text {
+  color: #ffffff !important;
+  opacity: 1 !important;
 }
 
- /* search textbox of synced tabs sidebar */
-  search-textbox {
-		-moz-appearance: none !important;
-		--focus-outline-color: transparent !important;
-		background-color: #000000 !important;
-		border-radius: 4px !important;
-		border: transparent !important;
-		margin-bottom: 2px !important;
-		background-position: bottom !important;
-		background-size: auto 2px !important;
-		background-repeat: no-repeat !important;
-		background-image: linear-gradient(to right, rgb(159, 26, 255, 0.7), rgb(159, 26, 255, 0.7), rgb(138, 70, 255, 0.7), rgb(118, 93, 255, 0.7), rgb(93, 125, 255, 0.7), rgb(62, 140, 255, 0.7), rgb(28, 153, 255, 0.7), rgb(0, 165, 255, 0.7), rgb(0, 180, 255, 0.7), rgb(0, 195, 255, 0.7), rgb(0, 208, 255, 0.7), rgb(0, 221, 255, 0.7)) !important;
-    }
-
-	search-textbox:focus {
-		-moz-appearance: none !important;
-		background-color: rgb(17, 17, 17) !important;
-		border-radius: 4px !important;
-		border: transparent !important;
-		margin-bottom: 2px !important;
-		background-position: bottom !important;
-		background-size: auto 2px !important;
-		background-repeat: no-repeat !important;
-		background-image: linear-gradient(to right, rgb(159, 26, 255, 0.7), rgb(159, 26, 255, 0.7), rgb(138, 70, 255, 0.7), rgb(118, 93, 255, 0.7), rgb(93, 125, 255, 0.7), rgb(62, 140, 255, 0.7), rgb(28, 153, 255, 0.7), rgb(0, 165, 255, 0.7), rgb(0, 180, 255, 0.7), rgb(0, 195, 255, 0.7), rgb(0, 208, 255, 0.7), rgb(0, 221, 255, 0.7)) !important;
-	  }
-
-	
-#editBookmarkPanel .expander-up, #editBookmarkPanel .expander-down {
-	border: transparent !important;
-	border-radius: 4px !important;
+menuitem[_moz-menuactive="true"],
+menu[_moz-menuactive="true"],
+menuitem:hover,
+menu:hover {
+  background-color: #313131 !important;
+  color: #00ddff !important;
 }
 
-@-moz-document url("chrome://browser/content/places/bookmarkProperties.xhtml"){
-	dialog[subdialog] {
-		background-color: #101010 !important;
-	  }
-
-	  .titleIcon {
-		background-color: transparent !important;
-	  }
-
-	  
-
+menuitem[_moz-menuactive="true"] .menu-text,
+menu[_moz-menuactive="true"] .menu-text {
+  color: #00ddff !important;
 }
 
-@-moz-document url("chrome://browser/content/places/bookmarkProperties2.xhtml"){
-	dialog[subdialog] {
-		background-color: #101010 !important;
-	  }
-
-	  .titleIcon {
-		background-color: transparent !important;
-	  }
-
-	  
-
+/* Context menu top buttons (back, forward, reload, bookmark) */
+menugroup > menuitem {
+  border-radius: 4px !important;
+}
+menugroup > menuitem:first-child {
+  padding-left: 4px !important;
+}
+menugroup > menuitem:last-child {
+  padding-right: 4px !important;
+}
+menugroup > menuitem > hbox > image {
+  border-radius: 4px !important;
 }
 
-/*Context menu colors match arrowpanel colors*/
-	menupopup {
-	--panel-color: var(--arrowpanel-color, Field) !important;                                                         
-	--panel-border-color: var(--arrowpanel-border-color,Field)!important;                                            
-	--panel-background: var(--arrowpanel-background, Field) !important;                                               
-	--menuitem-hover-background-color: var(--panel-item-hover-bgcolor, Field) !important;   
-	--menuitem-disabled-hover-background-color: var(--panel-item-hover-bgcolor, Field) !important;                    
-	--menu-color:var(--arrowpanel-color,Field) !important;                                                           
-	--menu-disabled-color:color-mix(in srgb, var(--arrowpanel-background,Field) 65%, var(--lwt-tab-text,Field))!important; 
-	--menu-border-color: var(--panel-separator-color,Field) !important;
-} 
-/*#contentAreaContextMenu{
-	--panel-color: var(--arrowpanel-color, Field) !important;                                                         
-	--panel-border-color: var(--arrowpanel-border-color,Field)!important;                                            
-	--panel-background: var(--arrowpanel-background, Field) !important;                                               
-	--menuitem-hover-background-color: var(--panel-item-hover-bgcolor, Field) !important;   
-	--menuitem-disabled-hover-background-color: var(--panel-item-hover-bgcolor, Field) !important;                    
-	--menu-color:var(--arrowpanel-color,Field) !important;                                                           
-	--menu-disabled-color:color-mix(in srgb, var(--arrowpanel-background,Field) 65%, var(--lwt-tab-text,Field))!important; 
-	--menu-border-color: var(--panel-separator-color,Field) !important;
-}*/
+/* Menu item with submenu */
+.panel-header > .subviewbutton {
+  border-radius: 4px !important;
+}
 
-#textbox-contextmenu{
-	--panel-color: rgba(255, 255, 255, 0.800000011920929) !important;
-	--panel-border-color: rgb(48, 48, 48) !important;
-	--panel-background: #101010 !important;
-	--menuitem-hover-background-color: #313131 !important;   
-	--menuitem-disabled-hover-background-color: #1f1f1f !important;                    
-	--menu-color: rgba(255, 255, 255, 0.8) !important;                                                           
-	--menu-disabled-color:color-mix(in srgb, #101010 65%, rgb(255, 255, 255))!important; 
-	--menu-border-color: var(--panel-separator-color,Field) !important;
+toolbarbutton {
+  --arrowpanel-menuitem-padding: 2px 8px;
+}
+
+/* White icons in menus and toolbars */
+.menu-icon,
+.subviewbutton-icon,
+.toolbarbutton-icon {
+  fill: #ffffff !important;
+  color: #ffffff !important;
+  opacity: 1 !important;
+  -moz-context-properties: fill, fill-opacity, stroke, stroke-opacity !important;
+}
+
+/* Separators */
+menuseparator,
+toolbarseparator {
+  appearance: auto !important;
+  opacity: 0.2 !important;
+}
+
+menuseparator {
+  padding: 0 !important;
+  margin: 4px 6px !important;
+  border-top: 1px solid #313131 !important;
+}
+
+/* Floating gradient line in the app menu */
+#appMenu-fxa-separator,
+#appMenu-mainView menuseparator:first-of-type {
+  appearance: none !important;
+  display: block !important;
+  height: 1.5px !important;
+  min-height: 1.5px !important;
+  max-height: 1.5px !important;
+  background: linear-gradient(to right, #cc66ff, #00cccc) !important;
+  margin: 4px 8px !important;
+  padding: 0 !important;
+  border: none !important;
+  opacity: 1 !important;
+  width: auto !important;
+}
+
+/* Autocomplete dropdowns (logins, form history) */
+#PopupAutoComplete > richlistbox > richlistitem {
+  border-radius: 4px !important;
+}
+
+.autocomplete-richlistbox {
+  margin: 4px !important;
+  color: var(--arrowpanel-color, Field) !important;
+}
+
+.ac-title,
+.ac-text,
+.ac-url,
+.ac-action,
+.autocomplete-richlistitem {
+  color: #ffffff !important;
+}
+
+/* Link hover tooltip */
+#statuspanel-label {
+  -moz-appearance: none !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+  background-color: #101010 !important;
+  border: 1px solid transparent !important;
+  border-image: 0 0 1 0 var(--uc-gradient) !important;
+}
+
+/* Confirmation notifications (tab sent, bookmark added...) */
+#confirmation-hint {
+  --arrowpanel-background: #9400ff !important;
+  --arrowpanel-border-color: #9400ff !important;
+}
+
+/* ==================== CUSTOMIZE MODE ==================== */
+
+#customization-done-button {
+  border-radius: 4px !important;
+  border-color: transparent !important;
+  background-color: -moz-accent-color !important;
+}
+
+#customization-done-button:is(:active, :hover):not([disabled]) {
+  background-color: color-mix(in srgb, black 10%, -moz-accent-color) !important;
+}
+
+#customization-reset-button,
+#customization-toolbar-visibility-button,
+#customization-uidensity-button,
+#customization-undo-reset-button {
+  color: #fff !important;
+  border-radius: 4px !important;
+  border-color: #313131 !important;
+  background-color: #2a2a2a !important;
+}
+
+#customization-reset-button:is(:active, :hover):not([disabled]),
+#customization-toolbar-visibility-button:is(:active, :hover):not([disabled]),
+#customization-uidensity-button:is(:active, :hover):not([disabled]),
+#customization-undo-reset-button:is(:active, :hover):not([disabled]) {
+  background-color: #313131 !important;
+}
+
+/* ==================== OTHER WINDOWS ==================== */
+
+/* Prevent white flash during page load */
+@-moz-document url("chrome://browser/content/browser.xhtml") {
+  #main-window,
+  browser[type="content-primary"],
+  browser[type="content"] {
+    background: #000000 !important;
+  }
+}
+
+/* Dark menus in windows without the browser's panel colors */
+@-moz-document url("chrome://browser/content/syncedtabs/sidebar.html"),
+  url("chrome://browser/content/pageinfo/pageInfo.xhtml"),
+  url("chrome://devtools/content/webconsole/index.html"),
+  url("chrome://devtools/content/framework/toolbox-window.xhtml"),
+  url("chrome://mozapps/content/downloads/unknownContentType.xhtml"),
+  url("chrome://global/content/alerts/alert.xhtml") {
+  menupopup {
+    --panel-border-color: rgb(48, 48, 48) !important;
+    --menuitem-hover-background-color: #313131 !important;
+    --menuitem-disabled-hover-background-color: #1f1f1f !important;
+    --menu-color: rgba(255, 255, 255, 0.8) !important;
+    --menu-disabled-color: color-mix(in srgb, #101010 65%, rgb(255, 255, 255)) !important;
+    --menu-border-color: var(--panel-separator-color, Field) !important;
+  }
+}
+
+@-moz-document url("chrome://mozapps/content/downloads/unknownContentType.xhtml") {
+  #openHandler {
+    -moz-appearance: none !important;
+    background: #101010 !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+    border-radius: 4px !important;
+    transition: background 300ms cubic-bezier(0.245, 0.045, 0.255, 0.4) !important;
   }
 
-  /*#toolbar-context-menu{
-	--panel-color: rgba(255, 255, 255, 0.800000011920929) !important;
-	--panel-border-color: rgb(48, 48, 48) !important;
-	--panel-background: #101010 !important;
-	--menuitem-hover-background-color: #313131 !important;   
-	--menuitem-disabled-hover-background-color: #1f1f1f !important;                    
-	--menu-color: rgba(255, 255, 255, 0.8) !important;                                                           
-	--menu-disabled-color:color-mix(in srgb, #101010 65%, rgb(255, 255, 255))!important; 
-	--menu-border-color: var(--panel-separator-color,Field) !important;
-  }*/
+  #openHandler:hover {
+    background: #313131 !important;
+  }
 
-/*fix background of some popup menus like in pdf viewer zoom menu*/	
-menu:not([_moz-menuactive="true"]), menuitem:not([_moz-menuactive="true"]){
-
-	--content-select-background-image: none !important;
-}
-
-/*fixes menu color for websites*/
-#ContentSelectDropdown > menupopup {
-    background-color: transparent !important;
-    --content-select-background-image: none !important;
-    --panel-background: var(--arrowpanel-background, Field) !important; 
-    --panel-color: var(--arrowpanel-color, Field) !important; 
-} 
-
-
-@-moz-document url("chrome://browser/content/places/bookmarksSidebar.xhtml"){
-
-	menupopup {
-		
-		--panel-color: rgba(255, 255, 255, 0.800000011920929) !important;
-		--panel-border-color: rgb(48, 48, 48) !important;
-		--panel-background: #101010 !important;
-		--menuitem-hover-background-color: #313131 !important;   
-		--menuitem-disabled-hover-background-color: #1f1f1f !important;                    
-		--menu-color: rgba(255, 255, 255, 0.8) !important;                                                           
-		--menu-disabled-color:color-mix(in srgb, #101010 65%, rgb(255, 255, 255))!important; 
-		--menu-border-color: var(--panel-separator-color,Field) !important;
-	  }
-		
-
-}
-
-
-@-moz-document url("chrome://browser/content/places/historySidebar.xhtml"){
-	menupopup {
-		
-		--panel-color: rgba(255, 255, 255, 0.800000011920929) !important;
-		--panel-border-color: rgb(48, 48, 48) !important;
-		--panel-background: #101010 !important;
-		--menuitem-hover-background-color: #313131 !important;   
-		--menuitem-disabled-hover-background-color: #1f1f1f !important;                    
-		--menu-color: rgba(255, 255, 255, 0.8) !important;                                                           
-		--menu-disabled-color:color-mix(in srgb, #101010 65%, rgb(255, 255, 255))!important; 
-		--menu-border-color: var(--panel-separator-color,Field) !important;
-	  }
-}
-
-@-moz-document url("chrome://browser/content/syncedtabs/sidebar.xhtml"){
-	menupopup {
-		
-		--panel-color: rgba(255, 255, 255, 0.800000011920929) !important;
-		--panel-border-color: rgb(48, 48, 48) !important;
-		--panel-background: #101010 !important;
-		--menuitem-hover-background-color: #313131 !important;   
-		--menuitem-disabled-hover-background-color: #1f1f1f !important;                    
-		--menu-color: rgba(255, 255, 255, 0.8) !important;                                                           
-		--menu-disabled-color:color-mix(in srgb, #101010 65%, rgb(255, 255, 255))!important; 
-		--menu-border-color: var(--panel-separator-color,Field) !important;
-	  }
-
-
-}
-
-@-moz-document url("chrome://browser/content/places/places.xhtml"){
-	menupopup {
-		
-		--panel-color: rgba(255, 255, 255, 0.800000011920929) !important;
-		--panel-border-color: rgb(48, 48, 48) !important;
-		--panel-background: #101010 !important;
-		--menuitem-hover-background-color: #313131 !important;   
-		--menuitem-disabled-hover-background-color: #1f1f1f !important;                    
-		--menu-color: rgba(255, 255, 255, 0.8) !important;                                                           
-		--menu-disabled-color:color-mix(in srgb, #101010 65%, rgb(255, 255, 255))!important; 
-		--menu-border-color: var(--panel-separator-color,Field) !important;
-	  }
-}
-
-@-moz-document url("chrome://browser/content/pageinfo/pageInfo.xhtml"){
-	menupopup {
-		
-		--panel-color: rgba(255, 255, 255, 0.800000011920929) !important;
-		--panel-border-color: rgb(48, 48, 48) !important;
-		--panel-background: #101010 !important;
-		--menuitem-hover-background-color: #313131 !important;   
-		--menuitem-disabled-hover-background-color: #1f1f1f !important;                    
-		--menu-color: rgba(255, 255, 255, 0.8) !important;                                                           
-		--menu-disabled-color:color-mix(in srgb, #101010 65%, rgb(255, 255, 255))!important; 
-		--menu-border-color: var(--panel-separator-color,Field) !important;
-	  }
-}
-
-@-moz-document url("chrome://devtools/content/webconsole/index.html"){
-	menupopup {
-		
-		--panel-color: rgba(255, 255, 255, 0.800000011920929) !important;
-		--panel-border-color: rgb(48, 48, 48) !important;
-		--panel-background: #101010 !important;
-		--menuitem-hover-background-color: #313131 !important;   
-		--menuitem-disabled-hover-background-color: #1f1f1f !important;                    
-		--menu-color: rgba(255, 255, 255, 0.8) !important;                                                           
-		--menu-disabled-color:color-mix(in srgb, #101010 65%, rgb(255, 255, 255))!important; 
-		--menu-border-color: var(--panel-separator-color,Field) !important;
-	  }
-}
-
-@-moz-document url("chrome://devtools/content/framework/toolbox-window.xhtml"){
-	menupopup {
-		
-		--panel-color: rgba(255, 255, 255, 0.800000011920929) !important;
-		--panel-border-color: rgb(48, 48, 48) !important;
-		--panel-background: #101010 !important;
-		--menuitem-hover-background-color: #313131 !important;   
-		--menuitem-disabled-hover-background-color: #1f1f1f !important;                    
-		--menu-color: rgba(255, 255, 255, 0.8) !important;                                                           
-		--menu-disabled-color:color-mix(in srgb, #101010 65%, rgb(255, 255, 255))!important; 
-		--menu-border-color: var(--panel-separator-color,Field) !important;
-	  }
-}
-
-@-moz-document url("chrome://mozapps/content/downloads/unknownContentType.xhtml"){
-	menupopup {
-		
-		--panel-color: rgba(255, 255, 255, 0.800000011920929) !important;
-		--panel-border-color: rgb(48, 48, 48) !important;
-		--panel-background: #101010 !important;
-		--menuitem-hover-background-color: #313131 !important;   
-		--menuitem-disabled-hover-background-color: #1f1f1f !important;                    
-		--menu-color: rgba(255, 255, 255, 0.8) !important;                                                           
-		--menu-disabled-color:color-mix(in srgb, #101010 65%, rgb(255, 255, 255))!important; 
-		--menu-border-color: var(--panel-separator-color,Field) !important;
-	  }
-
-	  #openHandler {
-		-moz-appearance: none !important;
-		background: #101010 !important;
-		color: rgba(255, 255, 255, 0.800000011920929) !important;
-		border-radius: 4px !important;
-		transition: background 300ms cubic-bezier(0.645, 0.045, 0.355, 1) !important;
-		
-	}
-
-	#openHandler:hover{
-		background: #313131 !important;
-			
-	}
-
-	#openHandlerBox{
-		-moz-appearance: none !important;
-		background: #101010 !important;
-		color: rgba(255, 255, 255, 0.800000011920929) !important;
-		border: 1px solid rgb(48, 48, 48) !important;
-		border-radius: 4px !important;
-	}
-
-	
-	
+  #openHandlerBox {
+    -moz-appearance: none !important;
+    background: #101010 !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+    border: 1px solid rgb(48, 48, 48) !important;
+    border-radius: 4px !important;
+  }
 }
 
 @-moz-document url("chrome://global/content/appPicker.xhtml") {
-
-	#app-picker-listbox {
-		border-radius: 4px !important;
-	  }
-
-	#app-picker-listbox > richlistitem {
-		border-radius: 4px !important;
-	  }
-
-	richlistbox {
-		border-radius: 4px !important;
-	  }
-
+  #app-picker-listbox,
+  #app-picker-listbox > richlistitem,
+  richlistbox {
+    border-radius: 4px !important;
+  }
 }
 
-/* in customize Nightly page */
-#customization-done-button:is(:active, :hover):not([disabled]) {
-	background-color: color-mix(in srgb, black 10%, -moz-accent-color) !important;
+@-moz-document url("chrome://global/content/commonDialog.xhtml") {
+  #commonDialog {
+    background-color: #101010 !important;
   }
 
-  #customization-done-button {
-	border-radius: 4px !important;
-	border-color: transparent !important;
-	background-color: -moz-accent-color !important;
+  .titleIcon {
+    background-color: transparent !important;
   }
-
-
-  #customization-reset-button{
-	  color: #fff !important;
-	border-radius: 4px !important;
-	border-color: #313131 !important;
-	background-color: #2a2a2a !important;
-  }
-
-  #customization-reset-button:is(:active, :hover):not([disabled]) {
-	background-color: #313131 !important;
-  }
-
-  #customization-toolbar-visibility-button {
-	color: #fff !important;
-	border-radius: 4px !important;
-	border-color: #313131 !important;
-	background-color: #2a2a2a !important;
-  }
-
-  #customization-toolbar-visibility-button:is(:active, :hover):not([disabled]) {
-	background-color: #313131 !important;
-  }
-
-  #customization-uidensity-button{
-	color: #fff !important;
-	border-radius: 4px !important;
-	border-color: #313131 !important;
-	background-color: #2a2a2a !important;
-  }
-
-  #customization-uidensity-button:is(:active, :hover):not([disabled]) {
-	background-color: #313131 !important;
-  }
-
-  #customization-undo-reset-button{
-	color: #fff !important;
-	border-radius: 4px !important;
-	border-color: #313131 !important;
-	background-color: #2a2a2a !important;
-  }
-
-  #customization-undo-reset-button:is(:active, :hover):not([disabled]) {
-	background-color: #313131 !important;
-  }
-
-/*■■■■■■■■■■■■■■■■■■■■■■■■■■ ultra compact mode ■■■■■■■■■■■■■■■■■■■■■■■■■■*/
-
-:root {
-	/* reduce tab margin */
-	--tab-block-margin: 3px 3px !important;
-  }
-  
-  /* reduce tab height */
-  .tabbrowser-tab {
-	min-height: 24px !important;
-  }
-  
-  /* prevent tab overflow increased height  */ 
-  #tabbrowser-arrowscrollbox {
-	--tab-min-height: 31px !important;
-	max-height: var(--tab-min-height);
-  }
-  
-  /* green tab attention icon */
-  /* in console for testing: var titlechanger = window.setInterval(function(){document.title=document.title+'0';}, 5000); */
-  .tabbrowser-tab:is([image], [pinned]) > .tab-stack > .tab-content[attention]:not([selected="true"]), .tabbrowser-tab > .tab-stack > .tab-content[pinned][titlechanged]:not([selected="true"]) {
-	background-position-x: left 2px !important;
-	background-position-y: bottom 12.5px !important;
-  }
-  
-  /* vertical alignment urlbar */
-  #urlbar[breakout=true]:not([open="true"]) {
-	  --urlbar-height: 20px !important;
-	  --urlbar-toolbar-height: 24px !important;
-  }
-  
-  /* URL address vertical aligment when megabar is open */
-  #urlbar[breakout=true][open="true"] {
-	  --urlbar-toolbar-height: 30px !important;
-  }
-  
-
-  /* Searchbar */
-  #urlbar-container, 
-  #search-container {
-	  padding-block: 0 !important;
-  }
-  
-  #search-container {
-	min-width: 192px !important;
-  }
-  
-  /* Reduce spacing in toolbar */
-  #urlbar-container {
-	  --urlbar-container-height: 30px !important;
-	margin-top: 0 !important;
-  }
-  
-  /*newtab icon padding fix for ultra compact mode*/
-  #TabsToolbar{ --toolbarbutton-inner-padding: 4px !important; }
-
-
-/*------------------------------------*/
-
-
-/*message infobar*/
-.container.infobar::before {
-	background-image: linear-gradient(#9f1aff, #9f1aff, #8a46ff, #765dff, #5d7dff, #3e8cff, #1c99ff, #00a5ff, #00b4ff, #00c3ff, #00d0ff, #00ddff) !important;
 }
 
-.close{
-	transition: fill 300ms cubic-bezier(0.645, 0.045, 0.355, 1) !important;	
-  }
-  .close:hover {
-	fill: #FF0000 !important;	
-  }
-
-  .container.infobar {
-	background: #313131 !important;
-  }
-
-
-  @-moz-document url("chrome://global/content/commonDialog.xhtml"){
-	
-	.dialog-content-box {
-		background-color: #101010 !important;
-		}
-
-		#commonDialog {
-			background-color: #101010 !important;
-			
-			}
-
-			.titleIcon {
-				background-color: transparent !important;
-			}
-  }
-
-  @-moz-document url("chrome://mozapps/content/handling/permissionDialog.xhtml"),
+@-moz-document url("chrome://mozapps/content/handling/permissionDialog.xhtml"),
   url("chrome://mozapps/content/handling/appChooser.xhtml") {
-		.dialog-content-box {
-			background-color: #101010 !important;
-			}
+  #handling {
+    background-color: #101010 !important;
+  }
 
-			#handling {
-				background-color: #101010 !important;
-				}
+  richlistitem {
+    border-radius: 4px !important;
+    margin: 4px !important;
+  }
+}
 
-				richlistitem {
-					border-radius: 4px !important;
-					margin-top: 4px !important;
-					margin-bottom: 4px !important;
-					margin-left: 4px !important;
-					margin-right: 4px !important;
-
-
-				  }
-
-	}
-
-/* HTML5 dark mode web notifs */
+/* HTML5 dark mode web notifications */
 @-moz-document url("chrome://global/content/alerts/alert.xhtml") {
-	#alertBox {
-	  border-color: rgb(48, 48, 48, .4) !important;
-	  border-radius: 4px !important;
-	  background-color: #101010 !important;
-	  color: rgba(255, 255, 255, 0.800000011920929) !important;
-	}
-
-	#alertSourceLabel {
-		color: #9400ff !important;
-		
-		/*proton color: rgb(5,209,241)*/
-	  }
-
-	#alertSettings {
-	  -moz-context-properties: fill, fill-opacity !important;
-	  padding: 3px !important;
-	  margin: 0px 2px -3px 0px !important;
-	  color: inherit !important;
-	  border-radius: 4px !important;
-	  transform: scale(0.91, 0.91) !important;
-	}
-
-	#alertSettings:hover,  #alertSettings[open] {
-	  background-color: #313131 !important; 
-	}
-
-	menupopup {
-		
-		--panel-color: rgba(255, 255, 255, 0.800000011920929) !important;
-		--panel-border-color: rgb(48, 48, 48) !important;
-		--panel-background: #101010 !important;
-		--menuitem-hover-background-color: #313131 !important;   
-		--menuitem-disabled-hover-background-color: #1f1f1f !important;                    
-		--menu-color: rgba(255, 255, 255, 0.8) !important;                                                           
-		--menu-disabled-color:color-mix(in srgb, #101010 65%, rgb(255, 255, 255))!important; 
-		--menu-border-color: var(--panel-separator-color,Field) !important;
-	  }
-	
-	  #alertImage {
-		border-radius: 4px !important;
-  	}
-
+  #alertBox {
+    border-color: rgb(48, 48, 48, 0.2) !important;
+    border-radius: 4px !important;
+    background-color: #101010 !important;
+    color: rgba(255, 255, 255, 0.8) !important;
   }
 
-  /*confirmation notifs- tab sent, bookmark added...*/
-  #confirmation-hint {
-	--arrowpanel-background: #9400ff !important;
-	--arrowpanel-border-color: #9400ff !important;
+  #alertSourceLabel {
+    color: #9400ff !important;
   }
 
-/*titlebar min max close buttons*/
-.titlebar-buttonbox-container .titlebar-button .toolbarbutton-icon {
-	stroke: #9400ff;
-}
-
-.titlebar-buttonbox-container .titlebar-button.titlebar-close .toolbarbutton-icon {
-	stroke: #00DDFF;
-}
-
-.titlebar-buttonbox-container .titlebar-button.titlebar-close:hover .toolbarbutton-icon {
-	stroke: #ffffff;
-}
-
-/* prevent white flash during page load */
-@-moz-document url(chrome://browser/content/browser.xhtml)
-{
-
-  #main-window,
-  browser[type="content-primary"],
-  browser[type="content"],
-  tabbrowser#content,
-  #content,
-  browser[type="content"] > html
-  {
-     background: #000000 !important;
+  #alertSettings {
+    -moz-context-properties: fill, fill-opacity !important;
+    padding: 3px !important;
+    margin: 0px 2px -3px 0px !important;
+    color: inherit !important;
+    border-radius: 4px !important;
+    transform: scale(0.51, 0.51) !important;
   }
 
+  #alertSettings:hover,
+  #alertSettings[open] {
+    background-color: #313131 !important;
+  }
+
+  #alertImage {
+    border-radius: 4px !important;
+  }
 }

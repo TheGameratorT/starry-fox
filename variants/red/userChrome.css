@@ -1,0 +1,868 @@
+/* ==================== VARIABLES ==================== */
+
+:root {
+  /* Red → yellow accent gradient, solid and at 70% / 30% opacity */
+  --uc-gradient: linear-gradient(
+    to right,
+    #ff1a1a, #ff4646, #ff5d5d, #ff7676, #ff7d5d, #ff8c3e,
+    #ff991c, #ffa500, #ffc300, #ffd000, #ffdd00
+  );
+  --uc-gradient-70: linear-gradient(
+    to right,
+    #ff1a1ab3, #ff4646b3, #ff5d5db3, #ff7676b3, #ff7d5db3, #ff8c3eb3,
+    #ff991cb3, #ffa500b3, #ffc300b3, #ffd000b3, #ffdd00b3
+  );
+  --uc-gradient-30: linear-gradient(
+    to right,
+    #ff1a1a4d, #ff46464d, #ff5d5d4d, #ff76764d, #ff7d5d4d, #ff8c3e4d,
+    #ff991c4d, #ffa5004d, #ffc3004d, #ffd0004d, #ffdd004d
+  );
+
+  --toolbar-field-focus-border-color: transparent !important; /* remove default focus ring of url bar */
+  --organizer-outline-color: transparent !important; /* remove default focus ring of search box in library window */
+  --in-content-page-background: #101010 !important;
+  --tab-block-margin: 3px 3px !important; /* reduce tab margin */
+  -moz-appearance: none !important;
+}
+
+/* ==================== TOOLBOX & TOOLBARS ==================== */
+
+/* Theme colors behind the whole top area */
+#navigator-toolbox {
+  background-color: var(--lwt-accent-color) !important;
+  background-image: var(--lwt-header-image) !important;
+  background-position: right top !important;
+  border: none !important;
+  --tabs-navbar-shadow-size: 0px !important;
+}
+
+#TabsToolbar {
+  --toolbarbutton-inner-padding: 4px !important; /* newtab icon padding for compact mode */
+  padding-bottom: 0px !important;
+  margin-bottom: 0px !important;
+}
+
+/* Transparent nav bar, pulled up to fuse with the selected tab */
+#nav-bar {
+  background: transparent !important;
+  margin-top: -9px !important;
+  border: none !important;
+  box-shadow: none !important;
+  position: relative !important;
+  z-index: 0 !important;
+  /* Its top 9px sit under the tabs; keep the contents below them */
+  padding-top: 5px !important;
+}
+
+/* Bookmarks bar */
+#PersonalToolbar {
+  position: relative;
+  margin-bottom: 0;
+  z-index: 1;
+  background-color: rgba(39, 0, 0, 0.2) !important;
+}
+
+/* Floorp's "expand on focus" bookmarks bar overlaps the page with a margin
+   that assumes a 29px tall bar. Ours is shorter, so the page got pulled up
+   over the bottom of the nav bar. Float it below the toolbox instead. */
+#navigator-toolbox {
+  position: relative;
+}
+
+#PersonalToolbar:not([customizing]) {
+  position: absolute !important;
+  top: 100% !important;
+  inset-inline: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+toolbarbutton.bookmark-item {
+  margin-inline: 6px !important;
+}
+
+/* Remove drag space before 1st tab */
+:root[sizemode="normal"] .titlebar-spacer[type="pre-tabs"] {
+  display: none !important;
+}
+
+/* ==================== TABS ==================== */
+
+.tabbrowser-tab {
+  --tab-label-mask-size: 1em !important;
+  min-height: 24px !important;
+  padding-bottom: 0px !important;
+  margin-bottom: 0px !important;
+}
+
+#tabbrowser-tabs {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+  margin-bottom: 0px !important;
+  padding-bottom: 0px !important;
+}
+
+/* Prevent tab overflow increased height */
+#tabbrowser-arrowscrollbox {
+  --tab-min-height: 31px !important;
+  max-height: var(--tab-min-height);
+}
+
+/* Tab shape: rounded on all corners, as in starry-fox */
+.tab-background {
+  background-color: transparent !important;
+  background-image: none !important;
+  background-attachment: fixed !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  min-height: 33px !important;
+  margin-block: 0px !important;
+  border-radius: 4px !important;
+  overflow: hidden !important;
+  position: relative !important;
+}
+
+/* Selected tab gradient */
+.tabbrowser-tab[selected] .tab-background {
+  background: var(--uc-gradient-30) !important;
+}
+
+.tab-content {
+  padding-top: 0px !important;
+  align-items: center !important;
+}
+
+/* Close button hidden by default, appears on hover */
+.tabbrowser-tab:not([pinned]) .tab-close-button {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transition: opacity 200ms ease-in-out !important;
+}
+.tabbrowser-tab:not([pinned]):hover .tab-close-button {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.close-icon {
+  transition: fill 300ms cubic-bezier(0.245, 0.045, 0.255, 0.4) !important;
+}
+.close-icon:hover {
+  fill: #ff0000 !important;
+}
+
+/* Tab loading icon color */
+.tab-throbber::before {
+  fill: #ffdd00 !important;
+  opacity: 1 !important;
+}
+
+/* Icons match text color */
+.tab-icon-image {
+  fill: currentColor !important;
+  filter: none !important;
+}
+
+/* Container tabs: side indicators instead of the context line */
+#tabbrowser-tabs .tab-context-line {
+  display: none !important;
+}
+
+.tabbrowser-tab[class*="identity-color-"] {
+  border-left: 2px solid var(--identity-icon-color, #ff4d4d) !important;
+  border-right: 2px solid var(--identity-icon-color, #ff4d4d) !important;
+  border-radius: 4px !important;
+  background-clip: padding-box !important;
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  transition: border-width 0.15s ease-in-out, background-color 0.15s ease-in-out !important;
+}
+
+.tabbrowser-tab[selected][class*="identity-color-"] {
+  border-left-width: 4px !important;
+  border-right-width: 4px !important;
+  background-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+.tabbrowser-tab[class*="identity-color-"] .tab-label {
+  text-shadow: 0 0 0 var(--identity-tab-color, #ff4d4d) !important;
+}
+
+/* Cycling tab label colors: red, off-white, yellow, orange */
+.tabbrowser-tab:nth-child(4n + 1) .tab-label {
+  color: #ff6666 !important;
+}
+.tabbrowser-tab:nth-child(4n + 2) .tab-label {
+  color: #e0e0e0 !important;
+}
+.tabbrowser-tab:nth-child(4n + 3) .tab-label {
+  color: #ffcc00 !important;
+}
+.tabbrowser-tab:nth-child(4n) .tab-label {
+  color: #ff8c3e !important;
+}
+
+/* Unread and busy tabs */
+.tabbrowser-tab[titlechanged]:not([selected]) .tab-label,
+.tabbrowser-tab[busy]:not([selected]) .tab-label {
+  font-style: italic !important;
+  color: #ffdd00 !important;
+}
+
+/* Tab attention icon position */
+/* in console for testing: var titlechanger = window.setInterval(function(){document.title=document.title+'0';}, 5000); */
+.tabbrowser-tab:is([image], [pinned]) > .tab-stack > .tab-content[attention]:not([selected]),
+.tabbrowser-tab > .tab-stack > .tab-content[pinned][titlechanged]:not([selected]) {
+  background-position-x: left 2px !important;
+  background-position-y: bottom 12.5px !important;
+}
+
+/* New tab (+) button */
+#tabs-newtab-button .toolbarbutton-icon,
+#new-tab-button .toolbarbutton-icon {
+  fill: #ff6666 !important;
+  color: #ff6666 !important;
+  filter: none !important;
+}
+
+/* Ripple when a tab is selected */
+@keyframes ripple-effect {
+  from {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.5;
+  }
+  to {
+    transform: translate(-50%, -50%) scale(2.5); /* Lower scale keeps it from getting too wide */
+    opacity: 0;
+  }
+}
+
+.tab-background::before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 60px;
+  height: 60px;
+  aspect-ratio: 1 / 1 !important;
+  background-color: rgba(255, 255, 255, 0.7) !important;
+  border-radius: 50% !important;
+  transform: translate(-50%, -50%) scale(0);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.tabbrowser-tab:is([selected], :focus-within) .tab-background::before {
+  animation: ripple-effect 0.8s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+/* ==================== TITLEBAR BUTTONS ==================== */
+
+.titlebar-button {
+  transition: all 0.2s ease !important;
+  padding: 8px 12px !important;
+}
+
+.titlebar-button > .toolbarbutton-icon {
+  width: 12px !important;
+  height: 12px !important;
+  stroke: currentColor !important;
+  fill: currentColor !important;
+  filter: none !important;
+}
+
+.titlebar-close {
+  color: #ff6666 !important;
+}
+.titlebar-close:hover {
+  background-color: rgba(255, 102, 102, 0.2) !important;
+}
+
+.titlebar-min,
+.titlebar-max,
+.titlebar-restore {
+  color: #ffcc00 !important;
+}
+.titlebar-min:hover,
+.titlebar-max:hover {
+  background-color: rgba(255, 204, 0, 0.2) !important;
+}
+
+/* ==================== URL BAR ==================== */
+
+/* Set on :root, where Firefox derives the urlbar's inner sizes from it.
+   26px plus the 2px border and 1px padding below gives a 30px bar. */
+:root {
+  --urlbar-height: 26px !important;
+}
+
+#urlbar-container {
+  padding-block: 4px !important;
+  margin-top: 0 !important;
+}
+
+#urlbar {
+  border: 2px solid transparent !important;
+  border-radius: 4px !important;
+  padding: 1px !important;
+  background: none !important;
+  box-shadow: none !important;
+  /* Don't grow the input past the toolbar when the results open */
+  --urlbar-input-growth-open-block: 0px !important;
+  --urlbar-input-growth-open-inline: 0px !important;
+}
+
+/* Unfocused: red → yellow underline as in starry-fox, painted over the
+   bottom border so it stays inside the toolbar */
+#urlbar:not([focused], [open]) {
+  background: var(--uc-gradient-70) bottom / 100% 2px no-repeat border-box !important;
+}
+
+/* Focused/open: full gradient border */
+#urlbar:is([focused], [open]) {
+  background: linear-gradient(rgba(17, 17, 17, 0.7), rgba(17, 17, 17, 0.7)) padding-box,
+    var(--uc-gradient-70) border-box !important;
+}
+
+.urlbar-background {
+  border-radius: 2px !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.urlbar:is([focused], [open]) > .urlbar-background {
+  background: linear-gradient(rgba(17, 17, 17, 0.7), rgba(17, 17, 17, 0.7)) padding-box,
+    var(--uc-gradient-70) border-box !important;
+  box-shadow: none !important;
+}
+
+#urlbar-input {
+  background: transparent !important;
+  color: #fff !important;
+  border-radius: 6px !important;
+  padding: 0 4px !important;
+  box-shadow: none !important;
+}
+
+/* ==================== SEARCH BAR ==================== */
+
+#search-container {
+  padding-block: 0 !important;
+  min-width: 192px !important;
+}
+
+#searchbar {
+  border-radius: 4px !important;
+  border: transparent !important;
+  margin: 8px 12px !important;
+  padding: 6px 10px !important;
+  background-position: bottom !important;
+  background-size: auto 2px !important;
+  background-repeat: no-repeat !important;
+  background-image: var(--uc-gradient-70) !important;
+}
+
+.search-panel-tree > .autocomplete-richlistitem:hover {
+  border-radius: 4px !important;
+}
+
+.search-panel-current-engine {
+  margin-left: 4px !important;
+  margin-right: 4px !important;
+}
+
+/* ==================== SIDEBAR ==================== */
+
+.sidebar-splitter {
+  display: none !important;
+}
+
+#sidebar-box #sidebar-header #sidebar-switcher-target {
+  transition: background-color 300ms cubic-bezier(0.245, 0.045, 0.255, 0.4) !important;
+}
+#sidebar-box #sidebar-header #sidebar-switcher-target:hover,
+#sidebar-box #sidebar-header #sidebar-switcher-target.active {
+  background-color: #313131 !important;
+}
+
+/* Sidebar item hover and selection rounded */
+treechildren::-moz-tree-row,
+treechildren::-moz-tree-cell {
+  border-radius: 4px !important;
+}
+
+/* Synced tabs sidebar items */
+.item-title-container {
+  border-radius: 4px !important;
+  margin-left: 4px !important;
+  margin-right: 4px !important;
+}
+
+/* Search boxes: dark with a gradient underline */
+#sidebar-search-container #search-box,
+search-textbox {
+  -moz-appearance: none !important;
+  background-color: #000000 !important;
+  border-radius: 4px !important;
+  margin-bottom: 2px !important;
+  background-position: bottom !important;
+  background-size: auto 2px !important;
+  background-repeat: no-repeat !important;
+  background-image: var(--uc-gradient-70) !important;
+}
+
+#sidebar-search-container #search-box:focus,
+search-textbox:focus {
+  background-color: rgb(17, 17, 17) !important;
+}
+
+search-textbox {
+  --focus-outline-color: transparent !important;
+  border: transparent !important;
+}
+
+#editBookmarkPanel .expander-up,
+#editBookmarkPanel .expander-down {
+  border: transparent !important;
+  border-radius: 4px !important;
+}
+
+/* ==================== FINDBAR ==================== */
+/* Floating findbar at the top. Originally posted by @torkelicious in
+   https://github.com/sagars007/starry-fox/issues/13#issuecomment-2556900723 */
+
+findbar {
+  order: -1 !important;
+  margin-bottom: -33px !important;
+  position: relative;
+  border-top: none !important;
+  padding: 0 !important;
+  transition: transform 82ms linear, opacity 82ms linear 32ms !important;
+  background: none !important;
+  pointer-events: none;
+  z-index: 1;
+  white-space: nowrap;
+}
+
+findbar[hidden] {
+  transform: translateY(-36px);
+}
+
+findbar > .findbar-container,
+findbar > .close-icon {
+  border: 1px solid #250000 !important;
+  border-width: 0 0 1px 0px !important;
+  background-color: #000000 !important;
+  background-image: linear-gradient(#160000, #000000), var(--lwt-header-image, none);
+  pointer-events: auto;
+}
+
+findbar > .findbar-container {
+  flex-direction: row-reverse;
+  border-bottom-right-radius: 4px;
+  border-right-width: 1px;
+  height: initial !important;
+  overflow-inline: visible !important;
+  margin-inline-start: 8px;
+}
+
+findbar > .findbar-container > hbox {
+  margin: 0 30px;
+}
+
+findbar::before {
+  content: "";
+  display: flex;
+  flex-grow: 1;
+}
+
+.findbar-find-status {
+  display: flex;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-grow: 1;
+}
+
+.findbar-closebutton {
+  margin: 0 !important;
+  border-radius: 0 !important;
+  padding: 5px !important;
+  width: initial !important;
+}
+
+.findbar-closebutton > image {
+  padding: 3px;
+}
+
+.findbar-closebutton:hover > image {
+  background: dodgerblue !important;
+  border-radius: 4px;
+}
+
+.findbar-textbox::placeholder,
+.findbar-highlight,
+.findbar-case-sensitive,
+.findbar-match-diacritics,
+.findbar-entire-word,
+.findbar-label {
+  font-family: "Fira Sans", sans-serif !important;
+  color: white !important;
+}
+
+.findbar-textbox {
+  background-color: black !important;
+  color: white !important;
+  font-family: "Fira Sans", sans-serif !important;
+}
+
+/* ==================== MENUS & PANELS ==================== */
+
+/* Menus get the dark background and a thin red border */
+menupopup {
+  appearance: none !important;
+  border: 1px solid #ff1a1a !important;
+  border-radius: 4px !important;
+  padding: 0px !important;
+  background-color: #101010 !important;
+  box-shadow: 0 0 10px rgba(255, 26, 26, 0.3) !important;
+  min-width: 240px !important;
+
+  --panel-background: #101010 !important;
+  --panel-color: #ffffff !important;
+  --panel-border-color: var(--arrowpanel-border-color, Field) !important;
+  --menuitem-hover-background-color: var(--panel-item-hover-bgcolor, Field) !important;
+  --menuitem-disabled-hover-background-color: var(--panel-item-hover-bgcolor, Field) !important;
+  --menu-color: var(--arrowpanel-color, Field) !important;
+  --menu-disabled-color: color-mix(in srgb, var(--arrowpanel-background, Field) 65%, var(--lwt-tab-text, Field)) !important;
+  --menu-border-color: var(--panel-separator-color, Field) !important;
+}
+
+/* Panels draw no frame themselves; their inner content box does.
+   The middle-click autoscroll icon is a panel too and keeps Firefox's style. */
+panel:not(.autoscroller) {
+  appearance: none !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 8px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  min-width: 240px !important;
+
+  --panel-background: #101010 !important;
+  --panel-color: #ffffff !important;
+  --panel-border-color: transparent !important;
+  --panel-border-radius: 4px !important;
+}
+
+.panel-arrowcontent,
+#appMenu-mainView {
+  border: 1px solid #ff1a1a !important;
+  border-radius: 4px !important;
+  padding: 0px !important;
+  background-color: #101010 !important;
+}
+
+#appMenu-popup,
+#contentAreaContextMenu {
+  --panel-border-color: transparent !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#textbox-contextmenu {
+  --panel-color: rgba(255, 255, 255, 0.8) !important;
+  --panel-border-color: rgb(48, 48, 48) !important;
+  --panel-background: #101010 !important;
+  --menuitem-hover-background-color: #313131 !important;
+  --menuitem-disabled-hover-background-color: #1f1f1f !important;
+  --menu-color: rgba(255, 255, 255, 0.8) !important;
+  --menu-disabled-color: color-mix(in srgb, #101010 65%, rgb(255, 255, 255)) !important;
+  --menu-border-color: var(--panel-separator-color, Field) !important;
+}
+
+/* Fixes menu color for websites */
+#ContentSelectDropdown > menupopup {
+  background-color: transparent !important;
+  --content-select-background-image: none !important;
+  --panel-background: var(--arrowpanel-background, Field) !important;
+  --panel-color: var(--arrowpanel-color, Field) !important;
+}
+
+/* Fix background of some popup menus like in pdf viewer zoom menu */
+menu:not([_moz-menuactive="true"]),
+menuitem:not([_moz-menuactive="true"]) {
+  --content-select-background-image: none !important;
+}
+
+/* Menu items */
+menuitem,
+menu {
+  padding-block: 4px !important;
+  margin-inline: 4px !important;
+}
+
+menupopup > menuitem,
+menupopup > menu {
+  padding-block: 2px !important;
+  min-height: unset !important;
+  border-radius: 4px !important;
+}
+
+menuitem,
+menu,
+.menu-text,
+label,
+.toolbarbutton-text {
+  color: #ffffff !important;
+  opacity: 1 !important;
+}
+
+menuitem[_moz-menuactive="true"],
+menu[_moz-menuactive="true"],
+menuitem:hover,
+menu:hover {
+  background-color: #313131 !important;
+  color: #ffdd00 !important;
+}
+
+menuitem[_moz-menuactive="true"] .menu-text,
+menu[_moz-menuactive="true"] .menu-text {
+  color: #ffdd00 !important;
+}
+
+/* Context menu top buttons (back, forward, reload, bookmark) */
+menugroup > menuitem {
+  border-radius: 4px !important;
+}
+menugroup > menuitem:first-child {
+  padding-left: 4px !important;
+}
+menugroup > menuitem:last-child {
+  padding-right: 4px !important;
+}
+menugroup > menuitem > hbox > image {
+  border-radius: 4px !important;
+}
+
+/* Menu item with submenu */
+.panel-header > .subviewbutton {
+  border-radius: 4px !important;
+}
+
+toolbarbutton {
+  --arrowpanel-menuitem-padding: 2px 8px;
+}
+
+/* White icons in menus and toolbars */
+.menu-icon,
+.subviewbutton-icon,
+.toolbarbutton-icon {
+  fill: #ffffff !important;
+  color: #ffffff !important;
+  opacity: 1 !important;
+  -moz-context-properties: fill, fill-opacity, stroke, stroke-opacity !important;
+}
+
+/* Separators */
+menuseparator,
+toolbarseparator {
+  appearance: auto !important;
+  opacity: 0.2 !important;
+}
+
+menuseparator {
+  padding: 0 !important;
+  margin: 4px 6px !important;
+  border-top: 1px solid #313131 !important;
+}
+
+/* Floating gradient line in the app menu */
+#appMenu-fxa-separator,
+#appMenu-mainView menuseparator:first-of-type {
+  appearance: none !important;
+  display: block !important;
+  height: 1.5px !important;
+  min-height: 1.5px !important;
+  max-height: 1.5px !important;
+  background: linear-gradient(to right, #ff6666, #ffcc00) !important;
+  margin: 4px 8px !important;
+  padding: 0 !important;
+  border: none !important;
+  opacity: 1 !important;
+  width: auto !important;
+}
+
+/* Autocomplete dropdowns (logins, form history) */
+#PopupAutoComplete > richlistbox > richlistitem {
+  border-radius: 4px !important;
+}
+
+.autocomplete-richlistbox {
+  margin: 4px !important;
+  color: var(--arrowpanel-color, Field) !important;
+}
+
+.ac-title,
+.ac-text,
+.ac-url,
+.ac-action,
+.autocomplete-richlistitem {
+  color: #ffffff !important;
+}
+
+/* Link hover tooltip */
+#statuspanel-label {
+  -moz-appearance: none !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+  background-color: #101010 !important;
+  border: 1px solid transparent !important;
+  border-image: 0 0 1 0 var(--uc-gradient) !important;
+}
+
+/* Confirmation notifications (tab sent, bookmark added...) */
+#confirmation-hint {
+  --arrowpanel-background: #ff1a1a !important;
+  --arrowpanel-border-color: #ff1a1a !important;
+}
+
+/* ==================== CUSTOMIZE MODE ==================== */
+
+#customization-done-button {
+  border-radius: 4px !important;
+  border-color: transparent !important;
+  background-color: -moz-accent-color !important;
+}
+
+#customization-done-button:is(:active, :hover):not([disabled]) {
+  background-color: color-mix(in srgb, black 10%, -moz-accent-color) !important;
+}
+
+#customization-reset-button,
+#customization-toolbar-visibility-button,
+#customization-uidensity-button,
+#customization-undo-reset-button {
+  color: #fff !important;
+  border-radius: 4px !important;
+  border-color: #313131 !important;
+  background-color: #2a2a2a !important;
+}
+
+#customization-reset-button:is(:active, :hover):not([disabled]),
+#customization-toolbar-visibility-button:is(:active, :hover):not([disabled]),
+#customization-uidensity-button:is(:active, :hover):not([disabled]),
+#customization-undo-reset-button:is(:active, :hover):not([disabled]) {
+  background-color: #313131 !important;
+}
+
+/* ==================== OTHER WINDOWS ==================== */
+
+/* Prevent white flash during page load */
+@-moz-document url("chrome://browser/content/browser.xhtml") {
+  #main-window,
+  browser[type="content-primary"],
+  browser[type="content"] {
+    background: #000000 !important;
+  }
+}
+
+/* Dark menus in windows without the browser's panel colors */
+@-moz-document url("chrome://browser/content/syncedtabs/sidebar.html"),
+  url("chrome://browser/content/pageinfo/pageInfo.xhtml"),
+  url("chrome://devtools/content/webconsole/index.html"),
+  url("chrome://devtools/content/framework/toolbox-window.xhtml"),
+  url("chrome://mozapps/content/downloads/unknownContentType.xhtml"),
+  url("chrome://global/content/alerts/alert.xhtml") {
+  menupopup {
+    --panel-border-color: rgb(48, 48, 48) !important;
+    --menuitem-hover-background-color: #313131 !important;
+    --menuitem-disabled-hover-background-color: #1f1f1f !important;
+    --menu-color: rgba(255, 255, 255, 0.8) !important;
+    --menu-disabled-color: color-mix(in srgb, #101010 65%, rgb(255, 255, 255)) !important;
+    --menu-border-color: var(--panel-separator-color, Field) !important;
+  }
+}
+
+@-moz-document url("chrome://mozapps/content/downloads/unknownContentType.xhtml") {
+  #openHandler {
+    -moz-appearance: none !important;
+    background: #101010 !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+    border-radius: 4px !important;
+    transition: background 300ms cubic-bezier(0.245, 0.045, 0.255, 0.4) !important;
+  }
+
+  #openHandler:hover {
+    background: #313131 !important;
+  }
+
+  #openHandlerBox {
+    -moz-appearance: none !important;
+    background: #101010 !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+    border: 1px solid rgb(48, 48, 48) !important;
+    border-radius: 4px !important;
+  }
+}
+
+@-moz-document url("chrome://global/content/appPicker.xhtml") {
+  #app-picker-listbox,
+  #app-picker-listbox > richlistitem,
+  richlistbox {
+    border-radius: 4px !important;
+  }
+}
+
+@-moz-document url("chrome://global/content/commonDialog.xhtml") {
+  #commonDialog {
+    background-color: #101010 !important;
+  }
+
+  .titleIcon {
+    background-color: transparent !important;
+  }
+}
+
+@-moz-document url("chrome://mozapps/content/handling/permissionDialog.xhtml"),
+  url("chrome://mozapps/content/handling/appChooser.xhtml") {
+  #handling {
+    background-color: #101010 !important;
+  }
+
+  richlistitem {
+    border-radius: 4px !important;
+    margin: 4px !important;
+  }
+}
+
+/* HTML5 dark mode web notifications */
+@-moz-document url("chrome://global/content/alerts/alert.xhtml") {
+  #alertBox {
+    border-color: rgb(48, 48, 48, 0.2) !important;
+    border-radius: 4px !important;
+    background-color: #101010 !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+  }
+
+  #alertSourceLabel {
+    color: #ff1a1a !important;
+  }
+
+  #alertSettings {
+    -moz-context-properties: fill, fill-opacity !important;
+    padding: 3px !important;
+    margin: 0px 2px -3px 0px !important;
+    color: inherit !important;
+    border-radius: 4px !important;
+    transform: scale(0.51, 0.51) !important;
+  }
+
+  #alertSettings:hover,
+  #alertSettings[open] {
+    background-color: #313131 !important;
+  }
+
+  #alertImage {
+    border-radius: 4px !important;
+  }
+}
